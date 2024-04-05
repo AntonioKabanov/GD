@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "207008346656",
+    "project_id": "grilldonalds-36fe3",
+    "storage_bucket": "grilldonalds-36fe3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:207008346656:android:2d2dcdd82d007c95a10245",
+        "android_client_info": {
+          "package_name": "com.example.gd"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmo1YYoI_wAwrYJs05w8cZZV-qtS0ZxsM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
