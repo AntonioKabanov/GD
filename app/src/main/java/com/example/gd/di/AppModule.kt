@@ -1,7 +1,7 @@
 package com.example.gd.di
 
-import com.example.gd.data.AuthRepository
-import com.example.gd.data.AuthRepositoryImpl
+import com.example.gd.data.repositories.AuthRepository
+import com.example.gd.data.repositories.AuthRepositoryImpl
 import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
 import dagger.Provides

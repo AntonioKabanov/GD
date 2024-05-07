@@ -5,8 +5,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.gd.presentation.login_screen.SignInScreen
-import com.example.gd.presentation.signup_screen.SignUpScreen
+import com.example.gd.presentation.screens.login_screen.SignInScreen
+import com.example.gd.presentation.screens.signup_screen.SignUpScreen
 
 @Composable
 fun NavigationGraph(
