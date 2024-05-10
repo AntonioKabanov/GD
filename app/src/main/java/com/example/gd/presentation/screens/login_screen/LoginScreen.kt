@@ -182,7 +182,7 @@ fun LoginScreen(
                 }
                 if (state.value?.isError?.isNotEmpty() == true) {
                     Text(
-                        text = "Данные некорректны",
+                        text = "Произошла ошибка",
                         style = TextStyle(
                             color = Color.Red,
                             fontSize = 20.sp

@@ -7,4 +7,9 @@ object Constants {
 
     const val MIN_USERNAME_LENGTH = 3
     const val MIN_PASSWORD_LENGTH = 3
+
+    // Database
+    const val COLLECTION_NAME_USERS = "users"
+    const val COLLECTION_NAME_ROLES = "roles"
+
 }
