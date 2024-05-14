@@ -1,0 +1,68 @@
+package com.example.gd.di
+
+import com.example.gd.domain.repositories.AuthRepository
+import com.example.gd.data.AuthRepositoryImpl
+import com.example.gd.data.UserRepositoryImpl
+import com.example.gd.domain.repositories.UserRepository
+import com.example.gd.domain.use_cases.AuthUseCases.AuthenticationUseCases
+import com.example.gd.domain.use_cases.AuthUseCases.FirebaseAuthState
+import com.example.gd.domain.use_cases.AuthUseCases.FirebaseSignIn
+import com.example.gd.domain.use_cases.AuthUseCases.FirebaseSignOut
+import com.example.gd.domain.use_cases.AuthUseCases.FirebaseSignUp
+import com.example.gd.domain.use_cases.AuthUseCases.IsUserAuthenticated
+import com.example.gd.domain.use_cases.UserUseCases.GetUserDetails
+import com.example.gd.domain.use_cases.UserUseCases.SetUserDetails
+import com.example.gd.domain.use_cases.UserUseCases.UserUseCases
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+object AppModule {
+    @Provides
+    @Singleton
+    fun providesFirebaseAuth() = FirebaseAuth.getInstance()
+
+    @Provides
+    @Singleton
+    fun providesFirebaseFirestore() = FirebaseFirestore.getInstance()
+
+//    @Provides
+//    @Singleton
+//    fun providesFirebaseStorage() = FirebaseStorage.getInstance()
+
+    @Provides
+    @Singleton
+    fun providesAuthRepository(firebaseAuth: FirebaseAuth, database: FirebaseFirestore): AuthRepository {
+        return AuthRepositoryImpl(firebaseAuth, database)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuthUseCases(repository: AuthRepository) = AuthenticationUseCases(
+        isUserAuthenticated = IsUserAuthenticated(repository = repository),
+        firebaseAuthState = FirebaseAuthState(repository = repository),
+        firebaseSignIn = FirebaseSignIn(repository = repository),
+        firebaseSignOut = FirebaseSignOut(repository = repository),
+        firebaseSignUp = FirebaseSignUp(repository = repository)
+    )
+
+    @Provides
+    @Singleton
+    fun provideUserRepository(database: FirebaseFirestore): UserRepository {
+        return UserRepositoryImpl(database = database)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserUseCases(repository: UserRepository) = UserUseCases(
+        getUserDetails = GetUserDetails(repository = repository),
+        setUserDetails = SetUserDetails(repository = repository)
+    )
+}
