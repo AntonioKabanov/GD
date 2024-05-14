@@ -1,6 +1,7 @@
 package com.example.gd.presentation.screens.bottom
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -27,17 +28,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.gd.R
+import com.example.gd.presentation.Authentication.AuthenticationViewModel
 import com.example.gd.presentation.components.TopAppBarHome
 import com.example.gd.ui.theme.colorBlack
 import com.example.gd.ui.theme.colorRedDark
 import com.example.gd.ui.theme.colorRedGrayLight
 import com.example.gd.ui.theme.colorRedLite
 import com.example.gd.ui.theme.colorWhite
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController, authViewModel: AuthenticationViewModel = hiltViewModel()) {
     Box(
         modifier = Modifier
             .fillMaxSize()

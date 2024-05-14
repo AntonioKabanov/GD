@@ -14,7 +14,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.gd.navigation.Navigation
-import com.example.gd.navigation.NavigationGraph
 import com.example.gd.navigation.Screen
 import com.example.gd.presentation.components.StandardScaffold
 import com.example.gd.ui.theme.GDTheme
@@ -26,7 +25,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             GDTheme {
-                // A surface container using the 'background' color from the theme
                 GDComposeUIMain()
             }
         }

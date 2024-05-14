@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.gd.data.BottomNavItem
+import com.example.gd.domain.model.BottomNavItem
 import com.example.gd.navigation.Screen
 import com.example.gd.ui.theme.colorRedDark
 import com.example.gd.ui.theme.colorWhite

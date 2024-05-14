@@ -1,6 +1,6 @@
-package com.example.gd.data
+package com.example.gd.domain.model
 
-data class MenuItem(
+data class Product(
     val id: Int,
     val ordersImageId: String,
     val name: String,

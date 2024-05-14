@@ -25,8 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.gd.data.MyOrders
-import com.example.gd.data.repositories.MyOrdersDataDummy
+import com.example.gd.domain.model.MyOrders
+import com.example.gd.domain.repositories.MyOrdersDataDummy
 import com.example.gd.presentation.components.TopAppBarMyOrders
 import com.example.gd.ui.theme.colorBlack
 import com.example.gd.ui.theme.colorRedDark

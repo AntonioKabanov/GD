@@ -10,6 +10,19 @@ object Constants {
 
     // Database
     const val COLLECTION_NAME_USERS = "users"
-    const val COLLECTION_NAME_ROLES = "roles"
+    const val COLLECTION_NAME_CATEGORIES = "categories"
+    const val COLLECTION_NAME_PRODUCTS = "products"
+    const val COLLECTION_NAME_FEEDBACKS = "feedbacks"
+    const val COLLECTION_NAME_SALEPOINTS = "salepoints"
+
+    // orders и favorites будут привязаны к пользователю
+    // favId - ид пользователя (у каждого пользователя свой список понравившегося)
+    // orderId -
+    // еще с доставкой поработать
+
+    //Roles
+    const val ROLE_ADMIN = "Admin"
+    const val ROLE_MANAGER = "Manager"
+    const val ROLE_USER = "User"
 
 }

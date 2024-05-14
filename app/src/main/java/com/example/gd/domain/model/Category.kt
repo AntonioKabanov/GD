@@ -1,6 +1,6 @@
-package com.example.gd.data
+package com.example.gd.domain.model
 
-data class Categories(
+data class Category(
     val id: Long,
     val name: String,
     val image: String

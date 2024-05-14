@@ -12,21 +12,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.example.gd.R
-import com.example.gd.data.repositories.CategoriesRepository
-import com.example.gd.data.Categories
+import com.example.gd.domain.repositories.CategoriesRepository
+import com.example.gd.domain.model.Category
 import com.example.gd.ui.theme.GDTheme
-import com.example.gd.presentation.screens.login_screen.LoginScreen
 
 @Composable
 fun CategoryTabs(
-    categories: List<Categories>,
-    selectedCategory: Categories,
-    onCategorySelected: (Categories) -> Unit
+    categories: List<Category>,
+    selectedCategory: Category,
+    onCategorySelected: (Category) -> Unit
 ) {
     ScrollableTabRow(
         selectedTabIndex = categories.indexOf(selectedCategory),
@@ -51,7 +48,7 @@ private enum class CategoryTabState { Selected, NotSelected }
 
 @Composable
 private fun CategoryTab(
-    category: Categories,
+    category: Category,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -130,7 +127,7 @@ fun CategoryTabsPreviewDarkPreview() {
 private fun CategoryTabSelectedPreview() {
     GDTheme {
         CategoryTab(
-            category = Categories(
+            category = Category(
                 id = 0,
                 name = "Burgers",
                 image = ""
@@ -146,7 +143,7 @@ private fun CategoryTabSelectedPreview() {
 private fun CategoryTabNotSelectedPreview() {
     GDTheme {
         CategoryTab(
-            category = Categories(
+            category = Category(
                 id = 0,
                 name = "Burgers",
                 image = ""
@@ -162,7 +159,7 @@ private fun CategoryTabNotSelectedPreview() {
 private fun CategoryTabSelectedDarkPreview() {
     GDTheme(darkTheme = false) {
         CategoryTab(
-            category = Categories(
+            category = Category(
                 id = 0,
                 name = "Burgers",
                 image = ""
@@ -178,7 +175,7 @@ private fun CategoryTabSelectedDarkPreview() {
 private fun CategoryTabNotSelectedDarkPreview() {
     GDTheme(darkTheme = false) {
         CategoryTab(
-            category = Categories(
+            category = Category(
                 id = 0,
                 name = "Burgers",
                 image = ""

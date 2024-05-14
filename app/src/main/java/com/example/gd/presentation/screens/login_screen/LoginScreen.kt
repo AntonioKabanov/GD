@@ -20,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -28,34 +29,42 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.gd.R
 import com.example.gd.navigation.Screen
+import com.example.gd.presentation.Authentication.AuthenticationViewModel
+import com.example.gd.presentation.Authentication.Toast
 import com.example.gd.ui.theme.*
+import com.example.gd.util.Response
 import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
     navController: NavController,
-    viewModel: SignInViewModel = hiltViewModel()
-    ) {
+    viewModel: AuthenticationViewModel
+) {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
-    val state = viewModel.signInState.collectAsState(initial = null)
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(if (isSystemInDarkTheme()) Color.Black else colorPrimary)
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(rememberScrollState()),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .align(Alignment.BottomCenter)
                 .padding(20.dp),
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
+            Image(
+                painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                contentDescription = "LoginScreen Logo",
+                modifier = Modifier
+                    .width(250.dp)
+                    .padding(top = 16.dp)
+                    .padding(8.dp)
+            )
             TextField(value = email,
                 leadingIcon = {
                     Row(
@@ -80,6 +89,7 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 label = { Text(text = "Email") },
+                singleLine = true,
                 shape = RoundedCornerShape(24.dp),
                 onValueChange = {
                     email = it
@@ -171,32 +181,17 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 label = { Text(text = "Пароль") },
+                visualTransformation = PasswordVisualTransformation(),
+                singleLine = true,
                 shape = RoundedCornerShape(24.dp),
                 onValueChange = {
                     password = it
                 })
-            Spacer(modifier = Modifier.height(6.dp))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                if (state.value?.isLoading == true) {
-                    CircularProgressIndicator()
-                }
-                if (state.value?.isError?.isNotEmpty() == true) {
-                    Text(
-                        text = "Произошла ошибка",
-                        style = TextStyle(
-                            color = Color.Red,
-                            fontSize = 20.sp
-                        )
-                    )
-                }
-            }
             Spacer(modifier = Modifier.height(30.dp))
 
             Button(
                 onClick = {
-                    scope.launch {
-                        viewModel.loginUser(email, password)
-                    }
+                    viewModel.signIn(email, password)
                 },
                 colors = ButtonDefaults.buttonColors(backgroundColor = colorBlack),
                 modifier = Modifier
@@ -211,12 +206,38 @@ fun LoginScreen(
                     style = MaterialTheme.typography.button,
                     modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
                 )
+                when(val response = viewModel.signInState.value) {
+                    is Response.Loading -> {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(30.dp)
+                                .align(Alignment.CenterVertically)
+                                .padding(start = 5.dp),
+                            color = colorWhite
+                        )
+                    }
+                    is Response.Success -> {
+                        if(response.data) {
+                            LaunchedEffect(key1 = true) {
+                                navController.navigate(Screen.HomeScreen.route) {
+                                    popUpTo(Screen.LoginScreen.route) {
+                                        inclusive = true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    is Response.Error -> {
+                        Toast(message = response.message)
+                    }
+                }
             }
             Spacer(modifier = Modifier.height(10.dp))
 
             Button(
                 onClick = {
-                    navController.navigate(Screen.CreateAccountScreen.route)
+                    navController.navigate(Screen.CreateAccountScreen.route) {
+                        launchSingleTop = true
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(backgroundColor = colorRedLite),
                 modifier = Modifier
@@ -248,25 +269,6 @@ fun LoginScreen(
                     )
                 }
             }
-            LaunchedEffect(key1 = state.value?.isSuccess) {
-                scope.launch {
-                    if (state.value?.isSuccess?.isNotEmpty() == true) {
-                        val success = state.value?.isSuccess
-                        Toast.makeText(context, "$success", Toast.LENGTH_LONG).show()
-                        navController.popBackStack()
-                        navController.navigate(Screen.HomeScreen.route)
-                    }
-                }
-            }
-
-            LaunchedEffect(key1 = state.value?.isError) {
-                scope.launch {
-                    if (state.value?.isError?.isNotEmpty() == true) {
-                        val error = state.value?.isError
-                        Toast.makeText(context, "$error", Toast.LENGTH_LONG).show()
-                    }
-                }
-            }
         }
     }
 }
@@ -274,13 +276,18 @@ fun LoginScreen(
 @Composable
 @Preview
 fun LoginScreenPreview() {
-    LoginScreen(navController = NavController(LocalContext.current))
+    LoginScreen(
+        navController = NavController(LocalContext.current),
+        viewModel = hiltViewModel())
 }
 
 
 @Composable
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 fun LoginScreenDarkPreview() {
-    LoginScreen(navController = NavController(LocalContext.current))
+    LoginScreen(
+        navController = NavController(LocalContext.current),
+        viewModel = hiltViewModel()
+    )
 
 }

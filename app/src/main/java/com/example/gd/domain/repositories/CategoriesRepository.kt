@@ -1,37 +1,37 @@
-package com.example.gd.data.repositories
+package com.example.gd.domain.repositories
 
-import com.example.gd.data.Categories
+import com.example.gd.domain.model.Category
 
 object CategoriesRepository {
 
-    fun getCategoriesData(): List<Categories> {
+    fun getCategoriesData(): List<Category> {
         return listOf(
-            Categories(
+            Category(
                 id = 1,
                 name = "Burgers",
                 image = "https://raw.githubusercontent.com/hitanshu-dhawan/McCompose/main/app/src/main/res/drawable-nodpi/" + "category_burgers.png"
             ),
-            Categories(
+            Category(
                 id = 2,
                 name = "Pizza",
                 image = "https://raw.githubusercontent.com/hitanshu-dhawan/McCompose/main/app/src/main/res/drawable-nodpi/" + "category_fries.png"
             ),
-            Categories(
+            Category(
                 id = 3,
                 name = "Healthy",
                 image = "https://raw.githubusercontent.com/hitanshu-dhawan/McCompose/main/app/src/main/res/drawable-nodpi/" + "category_beverages.png"
             ),
-            Categories(
+            Category(
                 id = 4,
                 name = "Combo Meals",
                 image = "https://raw.githubusercontent.com/hitanshu-dhawan/McCompose/main/app/src/main/res/drawable-nodpi/" + "category_combo_meals.png"
             ),
-            Categories(
+            Category(
                 id = 5,
                 name = "Happy Meals",
                 image = "https://raw.githubusercontent.com/hitanshu-dhawan/McCompose/main/app/src/main/res/drawable-nodpi/" + "category_happy_meals.png"
             ),
-            Categories(
+            Category(
                 id = 6,
                 name = "Desserts",
                 image = "https://raw.githubusercontent.com/hitanshu-dhawan/McCompose/main/app/src/main/res/drawable-nodpi/" + "category_desserts.png"

@@ -1,6 +1,7 @@
 package com.example.gd.navigation
 
 sealed class Screen(val route: String) {
+    object SplashScreen : Screen("splash_screen")
     object WelcomeScreen : Screen("welcome_screen")
     object LoginScreen : Screen("login_screen")
     object CreateAccountScreen : Screen("create_account_screen")

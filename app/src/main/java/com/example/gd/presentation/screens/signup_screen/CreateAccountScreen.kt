@@ -1,7 +1,6 @@
 package com.example.gd.presentation.screens.signup_screen
 
 import android.content.res.Configuration
-import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,50 +13,58 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.gd.R
 import com.example.gd.navigation.Screen
+import com.example.gd.presentation.Authentication.AuthenticationViewModel
+import com.example.gd.presentation.Authentication.Toast
 import com.example.gd.ui.theme.colorBlack
 import com.example.gd.ui.theme.colorPrimary
 import com.example.gd.ui.theme.colorRedLite
 import com.example.gd.ui.theme.colorWhite
+import com.example.gd.util.Response
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun CreateAccountScreen(
     navController: NavController,
-    viewModel: SignUpViewModel = hiltViewModel()
+    viewModel: AuthenticationViewModel
 ) {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
-    val state = viewModel.signUpState.collectAsState(initial = null)
+    var userName by rememberSaveable { mutableStateOf("") }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(if (isSystemInDarkTheme()) Color.Black else colorPrimary)
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(rememberScrollState()),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .align(Alignment.BottomCenter)
                 .padding(20.dp),
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                contentDescription = "LoginScreen Logo",
+                modifier = Modifier
+                    .width(250.dp)
+                    .padding(top = 16.dp)
+                    .padding(8.dp)
+            )
             TextField(value = email,
                 leadingIcon = {
                     Row(
@@ -82,6 +89,7 @@ fun CreateAccountScreen(
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 label = { Text(text = "Email") },
+                singleLine = true,
                 shape = RoundedCornerShape(24.dp),
                 onValueChange = {
                     email = it
@@ -89,7 +97,7 @@ fun CreateAccountScreen(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            var usermobilenumber by remember { mutableStateOf("") } // ВРЕМЕННО НЕДОСТУПНО
+            /*var usermobilenumber by remember { mutableStateOf("") } // ВРЕМЕННО НЕДОСТУПНО
             val maxChar = 10
             TextField(
                 singleLine = true,
@@ -145,9 +153,7 @@ fun CreateAccountScreen(
                 onValueChange = {
                     if (it.length <= maxChar) usermobilenumber = it
                 }
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
+            )*/
 
             TextField(value = password,
                 leadingIcon = {
@@ -173,33 +179,50 @@ fun CreateAccountScreen(
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 label = { Text(text = "Пароль") },
+                singleLine = true,
+                visualTransformation = PasswordVisualTransformation(),
                 shape = RoundedCornerShape(24.dp),
                 onValueChange = {
                     password = it
                 })
-            Spacer(modifier = Modifier.height(6.dp))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                if (state.value?.isLoading == true) {
-                    CircularProgressIndicator()
-                }
-                if (state.value?.isError?.isNotEmpty() == true) {
-                    Text(
-                        text = "Данные некорректны",
-                        style = TextStyle(
-                            color = Color.Red,
-                            fontSize = 20.sp
-                        )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            TextField(value = userName,
+                leadingIcon = {
+                    Row(
+                        modifier = Modifier.wrapContentWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        content = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_accessibility_24),
+                                contentDescription = "",
+                                tint = Color.Gray
+                            )
+
+                        }
                     )
-                }
-            }
+                },
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = colorWhite,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                label = { Text(text = "Имя пользователя") },
+                singleLine = true,
+                shape = RoundedCornerShape(24.dp),
+                onValueChange = {
+                    userName = it
+                })
+
             Spacer(modifier = Modifier.height(30.dp))
 
             Button(
                 onClick = {
-                    scope.launch {
-                        viewModel.registerUser(email, password)
-                    }
-                    //navController.navigate(Screen.OtpVerifyScreen.route)
+                    viewModel.signUp(email, password, userName)
                 },
                 colors = ButtonDefaults.buttonColors(backgroundColor = colorBlack),
                 modifier = Modifier
@@ -209,18 +232,44 @@ fun CreateAccountScreen(
                 shape = RoundedCornerShape(24.dp)
             ) {
                 Text(
-                    text = "Создать аккаунт",
+                    text = "Зарегистрироваться",
                     color = colorWhite,
                     style = MaterialTheme.typography.button,
                     modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
                 )
+                when(val response = viewModel.signUpState.value) {
+                    is Response.Loading -> {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .size(30.dp)
+                                .align(Alignment.CenterVertically)
+                                .padding(start = 5.dp),
+                            color = colorWhite
+                        )
+                    }
+                    is Response.Success -> {
+                        if(response.data) {
+                            LaunchedEffect(key1 = true) {
+                                navController.navigate(Screen.HomeScreen.route) {
+                                    popUpTo(Screen.CreateAccountScreen.route) {
+                                        inclusive = true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    is Response.Error -> {
+                        Toast(message = response.message)
+                    }
+                }
             }
             Spacer(modifier = Modifier.height(10.dp))
 
             Button(
                 onClick = {
-                    navController.popBackStack()
-                    navController.navigate(Screen.LoginScreen.route)
+                    navController.navigate(Screen.LoginScreen.route) {
+                        launchSingleTop = true
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(backgroundColor = colorRedLite),
                 modifier = Modifier
@@ -237,41 +286,26 @@ fun CreateAccountScreen(
                 )
             }
             Spacer(modifier = Modifier.height(40.dp))
-
-            LaunchedEffect(key1 = state.value?.isSuccess) {
-                scope.launch {
-                    if (state.value?.isSuccess?.isNotEmpty() == true) {
-                        val success = state.value?.isSuccess
-                        Toast.makeText(context, "$success", Toast.LENGTH_LONG).show()
-                        navController.popBackStack()
-                        navController.navigate(Screen.HomeScreen.route)
-                    }
-                }
-            }
-
-            LaunchedEffect(key1 = state.value?.isError) {
-                scope.launch {
-                    if (state.value?.isError?.isNotEmpty() == true) {
-                        val error = state.value?.isError
-                        Toast.makeText(context, "$error", Toast.LENGTH_LONG).show()
-                    }
-                }
-            }
         }
-
     }
 }
 
 @Composable
 @Preview
 fun CreateAccountScreenPreview() {
-    CreateAccountScreen(navController = NavController(LocalContext.current))
+    CreateAccountScreen(
+        navController = NavController(LocalContext.current),
+        viewModel = hiltViewModel()
+    )
 }
 
 
 @Composable
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 fun CreateAccountScreenDarkPreview() {
-    CreateAccountScreen(navController = NavController(LocalContext.current))
+    CreateAccountScreen(
+        navController = NavController(LocalContext.current),
+        viewModel = hiltViewModel()
+    )
 
 }

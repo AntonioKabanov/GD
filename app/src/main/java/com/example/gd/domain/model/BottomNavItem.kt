@@ -1,4 +1,4 @@
-package com.example.gd.data
+package com.example.gd.domain.model
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
