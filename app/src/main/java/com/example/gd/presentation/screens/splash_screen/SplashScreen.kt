@@ -25,7 +25,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun SplashScreen(
     navController: NavController,
-    authViewModel: AuthenticationViewModel = hiltViewModel()
+    authViewModel: AuthenticationViewModel
 ){
     val authValue = authViewModel.isUserAuthenticated
     val scale = remember {
@@ -58,7 +58,7 @@ fun SplashScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         Image(
-            painter = painterResource(R.drawable.ic_launcher_foreground),
+            painter = painterResource(R.drawable.gd_logo),
             contentDescription = "SplashScreenLogo",
             modifier = Modifier.scale(scale.value)
         )
@@ -66,8 +66,9 @@ fun SplashScreen(
 
 }
 
+/*
 @Preview
 @Composable
 fun SplashScreenPreview() {
     SplashScreen(navController = NavController(LocalContext.current))
-}
+}*/

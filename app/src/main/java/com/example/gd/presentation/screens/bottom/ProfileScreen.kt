@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -61,6 +62,7 @@ import com.example.gd.ui.theme.colorGray
 import com.example.gd.ui.theme.colorRedDark
 import com.example.gd.ui.theme.colorRedLite
 import com.example.gd.ui.theme.colorWhite
+import com.example.gd.util.Constants
 import com.example.gd.util.Response
 
 @Composable
@@ -83,6 +85,28 @@ fun ProfileScreen(
     val defaultField = "Нет данных"
     val emptyField = "Поле не заполнено"
 
+    when(val response = authViewModel.deleteUserState.value) {
+        is Response.Loading -> {
+            CircularProgressIndicator()
+        }
+        is Response.Success -> {
+            if(response.data) {
+                Toast(message = "Аккаунт успешно удален")
+                LaunchedEffect(key1 = true) {
+                    navController.navigate(Screen.LoginScreen.route) {
+                        popUpTo(Screen.ProfileScreen.route) {
+                            inclusive = true
+                        }
+                    }
+                }
+            }
+        }
+        is Response.Error -> {
+            Toast(message = response.message)
+        }
+    }
+    //authViewModel.signOut()
+    userViewModel.getUserInfo()
     when(val response = userViewModel.getUserData.value) {
         is Response.Loading -> {}
         is Response.Error -> {
@@ -103,6 +127,7 @@ fun ProfileScreen(
             }
         }
     }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -205,7 +230,7 @@ fun ProfileScreen(
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 15.dp, start = 20.dp, end = 20.dp)
+                    .padding(top = 15.dp, start = 20.dp, end = 20.dp, bottom = 10.dp)
             ) {
                 if (isEditOpen) {
                     TextButton(
@@ -276,6 +301,7 @@ fun ProfileScreen(
                     }
                     is Response.Success -> {
                         if(response.data) {
+                            Toast(message = "Вы успешно вышли из аккаунта")
                             LaunchedEffect(key1 = true) {
                                 navController.navigate(Screen.LoginScreen.route) {
                                     popUpTo(Screen.ProfileScreen.route) {
@@ -290,7 +316,40 @@ fun ProfileScreen(
                     }
                 }
             }
-
+            if(!isEditOpen) {
+                if(userRole == Constants.ROLE_ADMIN) {
+                    TextButton(
+                        onClick = {
+                            navController.navigate(Screen.AdminPanelScreen.route)
+                        },
+                        modifier = Modifier
+                            .width(310.dp)
+                            .background(Color.Red, RoundedCornerShape(10.dp))
+                    ) {
+                        Text(
+                            text = "Админ-панель",
+                            style = MaterialTheme.typography.button,
+                            color = colorWhite
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+                TextButton(
+                    onClick = {
+                        authViewModel.deleteUser()
+                    },
+                    modifier = Modifier
+                        .width(310.dp)
+                        .background(colorGray, RoundedCornerShape(10.dp))
+                        .border(1.dp, Color.Red, RoundedCornerShape(10.dp))
+                ) {
+                    Text(
+                        text = "Удалить аккаунт",
+                        style = MaterialTheme.typography.button,
+                        color = Color.Red
+                    )
+                }
+            }
         }
     }
 }

@@ -211,7 +211,7 @@ fun CreateAccountScreen(
                 ),
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                label = { Text(text = "Имя пользователя") },
+                label = { Text(text = "Имя пользователя (необязательно)") },
                 singleLine = true,
                 shape = RoundedCornerShape(24.dp),
                 onValueChange = {
@@ -249,6 +249,7 @@ fun CreateAccountScreen(
                     }
                     is Response.Success -> {
                         if(response.data) {
+                            Toast(message = "Регистрация прошла успешно")
                             LaunchedEffect(key1 = true) {
                                 navController.navigate(Screen.HomeScreen.route) {
                                     popUpTo(Screen.CreateAccountScreen.route) {

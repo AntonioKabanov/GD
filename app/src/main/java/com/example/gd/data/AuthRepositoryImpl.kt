@@ -5,6 +5,7 @@ import android.util.Log
 import com.example.gd.domain.model.User
 import com.example.gd.domain.repositories.AuthRepository
 import com.example.gd.util.Constants
+import com.example.gd.util.Password
 import com.example.gd.util.Response
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -51,7 +52,13 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     @SuppressLint("SimpleDateFormat")
-    override suspend fun registerUser(email: String, password: String, userName: String): Flow<Response<Boolean>> = flow {
+    override suspend fun registerUser(
+        email: String,
+        password: String,
+        userName: String,
+        userRole: String
+    ): Flow<Response<Boolean>> = flow {
+
         operationSuccessful = false
         emit(Response.Loading)
         try {
@@ -65,9 +72,9 @@ class AuthRepositoryImpl @Inject constructor(
                 val obj = User(
                     userid = userid,
                     userName = userName,
-                    role = Constants.ROLE_USER,
+                    role = userRole.ifEmpty { Constants.ROLE_USER },
                     email = email,
-                    password = password,
+                    password = Password.md5(password),
                     registrationDate = registrationDate
                 )
                 database.collection(Constants.COLLECTION_NAME_USERS).document(userid)
@@ -85,10 +92,29 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun signOutUser(): Flow<Response<Boolean>> = flow {
+        emit(Response.Loading)
         try {
-            emit(Response.Loading)
             firebaseAuth.signOut()
             emit(Response.Success(true))
+        }
+        catch (e: Exception) {
+            emit(Response.Error(e.localizedMessage?:"Непредвиденная ошибка"))
+        }
+    }
+
+    override suspend fun deleteUser(): Flow<Response<Boolean>> = flow {
+        operationSuccessful = false
+        emit(Response.Loading)
+        try {
+            val userId = firebaseAuth.currentUser!!.uid
+            firebaseAuth.currentUser!!.delete().addOnSuccessListener {
+                operationSuccessful = true
+                firebaseAuth.signOut()
+                /*database.collection(Constants.COLLECTION_NAME_USERS)
+                    .document(userId)
+                    .delete()*/
+            }.await()
+            emit(Response.Success(operationSuccessful))
         }
         catch (e: Exception) {
             emit(Response.Error(e.localizedMessage?:"Непредвиденная ошибка"))

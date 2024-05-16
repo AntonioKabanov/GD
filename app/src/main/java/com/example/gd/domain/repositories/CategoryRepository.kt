@@ -5,5 +5,7 @@ import com.example.gd.util.Response
 import kotlinx.coroutines.flow.Flow
 
 interface CategoryRepository {
-    suspend fun getCategoryList(): Flow<Response<Category>>
+    suspend fun getCategoryList(): Flow<Response<List<Category>>>
+    suspend fun addNewCategory(name: String, categoryPhotoUrl: String): Flow<Response<Boolean>>
+    suspend fun deleteCategory(name: String): Flow<Response<Boolean>>
 }

@@ -25,9 +25,9 @@ class UserViewModel @Inject constructor(
     private val _setUserData = mutableStateOf<Response<Boolean>>(Response.Success(false))
     val setUserData: State<Response<Boolean>> = _setUserData
 
-    init {
+    /*init {
         getUserInfo()
-    }
+    }*/
 
     fun getUserInfo() {
         if(userid != null) {

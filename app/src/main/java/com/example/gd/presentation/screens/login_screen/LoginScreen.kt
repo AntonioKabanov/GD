@@ -96,67 +96,6 @@ fun LoginScreen(
                 }
             )
             Spacer(modifier = Modifier.height(10.dp))
-
-            /*var userephonenumber by remember { mutableStateOf("") }
-            val maxChar = 10
-            TextField(
-                singleLine = true,
-                value = userephonenumber,
-                leadingIcon = {
-                    Row(
-                        modifier = Modifier.wrapContentWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        content = {
-                            Image(
-                                painter = painterResource(id = R.drawable.indianflag),
-                                contentDescription = "",
-                                modifier = Modifier
-                                    .size(24.dp, 24.dp)
-                                    .padding(start = 10.dp)
-                            )
-                            Text(
-                                text = "+7",
-                                color = colorBlack,
-                                modifier = Modifier.padding(start = 10.dp)
-                            )
-                            Canvas(
-                                modifier = Modifier
-                                    .height(24.dp)
-                                    .padding(start = 10.dp)
-                            ) {
-                                drawLine(
-                                    color = Color.Gray,
-                                    start = Offset(0f, 0f),
-                                    end = Offset(0f, size.height),
-                                    strokeWidth = 2.0F
-                                )
-                            }
-                        }
-                    )
-                },
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = colorWhite,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent
-                ),
-                modifier = Modifier
-                    .fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                label = {
-                    Text(
-                        text = "Телефон",
-                        modifier = Modifier.padding(start = 10.dp)
-                    )
-                },
-                shape = RoundedCornerShape(24.dp),
-                onValueChange = {
-                    if (it.length <= maxChar) userephonenumber = it
-                }
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))*/
-
             TextField(value = password,
                 leadingIcon = {
                     Row(
@@ -217,6 +156,7 @@ fun LoginScreen(
                     }
                     is Response.Success -> {
                         if(response.data) {
+                            Toast(message = "Вход прошел успешно")
                             LaunchedEffect(key1 = true) {
                                 navController.navigate(Screen.HomeScreen.route) {
                                     popUpTo(Screen.LoginScreen.route) {

@@ -18,7 +18,7 @@ class UserRepositoryImpl @Inject constructor(
 ): UserRepository {
     private var operationSuccessul = false
     override suspend fun getUserDetails(userid: String): Flow<Response<User>> = callbackFlow {
-        Response.Loading
+
         val snapShotListener = database.collection(Constants.COLLECTION_NAME_USERS)
             .document(userid)
             .addSnapshotListener {snapshot, error ->
@@ -42,13 +42,17 @@ class UserRepositoryImpl @Inject constructor(
         phone: String,
         deliveryAddress: String,
     ): Flow<Response<Boolean>> = flow {
+        emit(Response.Loading)
         operationSuccessul = false
         try {
             val userObj = mutableMapOf<String, String>()
             userObj["userName"] = userName
             userObj["phone"] = phone
             userObj["deliveryAddress"] = deliveryAddress
-            database.collection(Constants.COLLECTION_NAME_USERS).document(userid).update(userObj as Map<String, Any>).addOnSuccessListener { operationSuccessul = true }.await()
+            database.collection(Constants.COLLECTION_NAME_USERS)
+                .document(userid)
+                .update(userObj as Map<String, Any>)
+                .addOnSuccessListener { operationSuccessul = true }.await()
 
             if(operationSuccessul) {
                 emit(Response.Success(operationSuccessul))
@@ -58,7 +62,7 @@ class UserRepositoryImpl @Inject constructor(
             }
         }
         catch (e: Exception) {
-            Response.Error(e.localizedMessage?:"Непредвиденная ошибка")
+            emit(Response.Error(e.localizedMessage?:"Непредвиденная ошибка"))
         }
     }
 }

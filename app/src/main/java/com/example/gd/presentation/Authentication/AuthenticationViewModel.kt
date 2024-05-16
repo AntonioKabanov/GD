@@ -25,6 +25,9 @@ class AuthenticationViewModel @Inject constructor(
     private val _signOutState = mutableStateOf<Response<Boolean>>(Response.Success(false))
     val signOutState: State<Response<Boolean>> = _signOutState
 
+    private val _deleteUserState = mutableStateOf<Response<Boolean>>(Response.Success(false))
+    val deleteUserState: State<Response<Boolean>> = _deleteUserState
+
     private val _firebaseAuthState = mutableStateOf<Boolean>(false)
     val firebaseAuthState: State<Boolean> = _firebaseAuthState
 
@@ -34,6 +37,7 @@ class AuthenticationViewModel @Inject constructor(
                 _signOutState.value = it
                 if (it == Response.Success(true)) {
                     _signInState.value = Response.Success(false)
+                    _signUpState.value = Response.Success(false)
                 }
             }
         }
@@ -45,6 +49,7 @@ class AuthenticationViewModel @Inject constructor(
                 _signInState.value = it
                 if (it == Response.Success(true)) {
                     _signOutState.value = Response.Success(false)
+                    _deleteUserState.value = Response.Success(false)
                 }
             }
         }
@@ -57,6 +62,20 @@ class AuthenticationViewModel @Inject constructor(
                 if (it == Response.Success(true)) {
                     _signInState.value = Response.Success(true)
                     _signOutState.value = Response.Success(false)
+                    _deleteUserState.value = Response.Success(false)
+                }
+            }
+        }
+    }
+
+    fun deleteUser() {
+        viewModelScope.launch {
+            authUseCases.firebaseDeleteUser().collect {
+                _deleteUserState.value = it
+                if(it == Response.Success(true)) {
+                    _signInState.value = Response.Success(false)
+                    _signUpState.value = Response.Success(false)
+                    _signOutState.value = Response.Success(true)
                 }
             }
         }

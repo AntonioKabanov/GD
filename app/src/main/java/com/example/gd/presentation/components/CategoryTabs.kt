@@ -11,13 +11,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.gd.R
 import com.example.gd.domain.repositories.CategoriesRepository
 import com.example.gd.domain.model.Category
 import com.example.gd.ui.theme.GDTheme
+import com.example.gd.ui.theme.colorBlack
+import com.example.gd.ui.theme.colorGray
 
 @Composable
 fun CategoryTabs(
@@ -61,14 +67,14 @@ private fun CategoryTab(
 
     val backgroundColor by transition.animateColor(label = "") { state ->
         when (state) {
-            CategoryTabState.Selected -> MaterialTheme.colors.primary
-            CategoryTabState.NotSelected -> MaterialTheme.colors.background
+            CategoryTabState.Selected -> Color.LightGray
+            CategoryTabState.NotSelected -> colorGray
         }
     }
     val contentColor by transition.animateColor(label = "") { state ->
         when (state) {
-            CategoryTabState.Selected -> LocalContentColor.current
-            CategoryTabState.NotSelected -> MaterialTheme.colors.primary
+            CategoryTabState.Selected -> colorBlack
+            CategoryTabState.NotSelected -> colorBlack
         }
     }
 
@@ -82,9 +88,11 @@ private fun CategoryTab(
             modifier = Modifier
                 .clickable(onClick = onClick)
                 .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+
         ) {
-            NetworkImage(
+            /*NetworkImage(
                 imageUrl = category.image,
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
@@ -92,10 +100,13 @@ private fun CategoryTab(
                     .height(32.dp),
                 previewPlaceholder = R.drawable.burger
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(8.dp))*/
             Text(
                 text = category.name,
-                style = MaterialTheme.typography.button,
+                style = TextStyle(
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.W400
+                ),
             )
         }
     }
@@ -128,7 +139,7 @@ private fun CategoryTabSelectedPreview() {
     GDTheme {
         CategoryTab(
             category = Category(
-                id = 0,
+                id = "0",
                 name = "Burgers",
                 image = ""
             ),
@@ -144,7 +155,7 @@ private fun CategoryTabNotSelectedPreview() {
     GDTheme {
         CategoryTab(
             category = Category(
-                id = 0,
+                id = "0",
                 name = "Burgers",
                 image = ""
             ),
@@ -160,7 +171,7 @@ private fun CategoryTabSelectedDarkPreview() {
     GDTheme(darkTheme = false) {
         CategoryTab(
             category = Category(
-                id = 0,
+                id = "0",
                 name = "Burgers",
                 image = ""
             ),
@@ -176,7 +187,7 @@ private fun CategoryTabNotSelectedDarkPreview() {
     GDTheme(darkTheme = false) {
         CategoryTab(
             category = Category(
-                id = 0,
+                id = "0",
                 name = "Burgers",
                 image = ""
             ),

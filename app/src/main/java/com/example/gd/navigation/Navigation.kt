@@ -9,10 +9,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.gd.presentation.*
 import com.example.gd.presentation.Authentication.AuthenticationViewModel
+import com.example.gd.presentation.Categories.CategoryViewModel
 import com.example.gd.presentation.screens.*
+import com.example.gd.presentation.screens.admin_panel.AdminPanelScreen
+import com.example.gd.presentation.screens.admin_panel.AdminViewModel
+import com.example.gd.presentation.screens.admin_panel.CategoryManageScreen
+import com.example.gd.presentation.screens.admin_panel.ProductManageScreen
+import com.example.gd.presentation.screens.admin_panel.UserManageScreen
 import com.example.gd.presentation.screens.bottom.*
 import com.example.gd.presentation.screens.login_screen.LoginScreen
 import com.example.gd.presentation.screens.order_screen.OrderScreen
+import com.example.gd.presentation.screens.product_screen.ProductScreen
 import com.example.gd.presentation.screens.signup_screen.CreateAccountScreen
 import com.example.gd.presentation.screens.signup_screen.OtpVerifyScreen
 import com.example.gd.presentation.screens.splash_screen.SplashScreen
@@ -22,7 +29,7 @@ import com.example.gd.presentation.screens.welcome_screen.WelcomeScreen
 fun Navigation(navController: NavHostController) {
 
     val authViewModel: AuthenticationViewModel = hiltViewModel()
-    //val userViewModel: UserViewModel = hiltViewModel()
+    val adminViewModel: AdminViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
@@ -33,7 +40,7 @@ fun Navigation(navController: NavHostController) {
         composable(
             route = Screen.SplashScreen.route
         ) {
-            SplashScreen(navController)
+            SplashScreen(navController, authViewModel)
         }
 
         composable(
@@ -56,7 +63,7 @@ fun Navigation(navController: NavHostController) {
         composable(
             route = Screen.HomeScreen.route
         ) {
-            HomeScreen(navController)
+            HomeScreen(navController, authViewModel = authViewModel)
         }
         composable(
             route = Screen.FavoriteScreen.route
@@ -73,11 +80,35 @@ fun Navigation(navController: NavHostController) {
         ) {
             OrderScreen(navController)
         }
-
         composable(
             route = Screen.ProfileScreen.route
         ) {
             ProfileScreen(navController, authViewModel = authViewModel)
         }
+        composable(
+            route = Screen.AdminPanelScreen.route
+        ) {
+            AdminPanelScreen(navController, adminViewModel = adminViewModel)
+        }
+        composable(
+            route = Screen.CategoryManageScreen.route
+        ) {
+            CategoryManageScreen(navController)
+        }
+        composable(
+            route = Screen.ProductManageScreen.route
+        ) {
+            ProductManageScreen(navController, adminViewModel = adminViewModel)
+        }
+        composable(
+            route = Screen.UserManageScreen.route
+        ) {
+            UserManageScreen(navController)
+        }
+        /*composable(
+            route = Screen.ProductScreen.route
+        ) {
+            ProductScreen(navController)
+        }*/
     }
 }

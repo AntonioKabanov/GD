@@ -31,17 +31,25 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.gd.R
+import com.example.gd.domain.model.Category
 import com.example.gd.presentation.Authentication.AuthenticationViewModel
+import com.example.gd.presentation.Authentication.Toast
+import com.example.gd.presentation.Categories.CategoryViewModel
+import com.example.gd.presentation.components.CategoryTabs
 import com.example.gd.presentation.components.TopAppBarHome
 import com.example.gd.ui.theme.colorBlack
 import com.example.gd.ui.theme.colorRedDark
 import com.example.gd.ui.theme.colorRedGrayLight
 import com.example.gd.ui.theme.colorRedLite
 import com.example.gd.ui.theme.colorWhite
+import com.example.gd.util.Response
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun HomeScreen(navController: NavController, authViewModel: AuthenticationViewModel = hiltViewModel()) {
+fun HomeScreen(
+    navController: NavController,
+    authViewModel: AuthenticationViewModel,
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -166,8 +174,22 @@ fun Header() {
 
 @Composable
 fun CategorySection() {
+    val categoryViewModel: CategoryViewModel = hiltViewModel()
+    var itemList = emptyList<Category>()
+
+    categoryViewModel.getCategoryList()
+    when(val response = categoryViewModel.getCategoryData.value) {
+        is Response.Loading -> {}
+        is Response.Success -> {
+            itemList = response.data
+        }
+        is Response.Error -> {
+            Toast(response.message)
+        }
+    }
+
     Column() {
-        val itemList = listOf("Бургеры", "Шаверма", "Хот-доги", "Бизнес-ланчи", "Роллы")
+        //val itemList = listOf("Бургеры", "Шаверма", "Хот-доги", "Бизнес-ланчи", "Роллы")
         val categoryImagesList = listOf<Int>(
             R.drawable.burger2,
             R.drawable.pizza,
@@ -204,50 +226,49 @@ fun CategorySection() {
 
         }
 
-
-        LazyRow(modifier = Modifier.fillMaxWidth(), content = {
+        /*LazyRow(modifier = Modifier.fillMaxWidth(), content = {
             items(itemList.size) { item ->
-
                 Box(
                     modifier = Modifier
                         .height(50.dp)
-                        .clip(RoundedCornerShape(24.dp))
+                        .clip(RoundedCornerShape(20.dp))
                         .background(color = if (item == 0) colorRedDark else colorRedGrayLight),
                     contentAlignment = Alignment.Center
                 ) {
-                    Row(
+                    *//*Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 2.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
-                    ) {
-                        Image(
+                    ) {*//*
+                        *//*Image(
                             painter = painterResource(categoryImagesList[item]),
                             contentDescription = "",
                             modifier = Modifier
                                 .size(60.dp, 60.dp)
                                 .padding(start = 20.dp),
                             contentScale = ContentScale.Fit
-                        )
-                        Text(
-                            modifier = Modifier
-                                .padding(
-                                    start = 5.dp,
-                                    end = 16.dp,
-                                    top = 8.dp,
-                                    bottom = 8.dp
-                                ),
-                            text = itemList[item],
-                            color = if (item == 0) colorWhite else Color.Black
-                        )
-                    }
+                        )*//*
+                        CategoryTabs(
+                            categories = ,
+                            selectedCategory =
+                        ) {
+
+                        }
+                    //}
                 }
 
                 Spacer(modifier = Modifier.width(10.dp))
-
             }
-        })
+        })*/
+        if (itemList.isNotEmpty()) {
+            CategoryTabs(
+                categories = itemList,
+                selectedCategory = itemList.first(),
+                onCategorySelected = {}
+            )
+        }
     }
 }
 
@@ -485,11 +506,13 @@ fun OfferDealSection() {
     }
 }
 
-
+/*
 @Composable
 @Preview
 fun HomeScreenPreview() {
-    HomeScreen(navController = NavController(LocalContext.current))
+    HomeScreen(
+        navController = NavController(LocalContext.current),
+    )
 }
 
 
@@ -497,7 +520,7 @@ fun HomeScreenPreview() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 fun HomeScreenDarkPreview() {
     HomeScreen(navController = NavController(LocalContext.current))
-}
+}*/
 
 
 
