@@ -100,6 +100,8 @@ dependencies {
     //glide
     implementation("com.github.bumptech.glide:glide:4.12.0")
     kapt("com.github.bumptech.glide:compiler:4.12.0")
+    implementation ("com.google.firebase:firebase-storage-ktx")
+    implementation ("com.github.bumptech.glide:compose:1.0.0-alpha.1")
 
     //palette
     implementation("androidx.palette:palette-ktx:1.0.0")
@@ -107,17 +109,9 @@ dependencies {
     //timber
     implementation("com.jakewharton.timber:timber:5.0.1")
 
-    // Retrofit
- /*   implementation("com.squareup")
-    implementation("com.squareup.retrofit2:converter-gson:$retrofit_version")
-    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.2")
-    implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2")*/
 
     //Icon
     implementation("androidx.compose.material:material-icons-extended:1.6.7")
-
-    //Material Icon
-    //implementation("androidx.compose.material:material-icons-extended:$compose_version")
 
 
     testImplementation(libs.junit)

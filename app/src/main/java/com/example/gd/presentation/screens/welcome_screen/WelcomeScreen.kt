@@ -16,7 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.gd.R
-import com.example.gd.navigation.Screen
+import com.example.gd.presentation.navigation.Screen
 import com.example.gd.ui.theme.colorBlack
 import com.example.gd.ui.theme.colorPrimary
 import com.example.gd.ui.theme.colorRedDark

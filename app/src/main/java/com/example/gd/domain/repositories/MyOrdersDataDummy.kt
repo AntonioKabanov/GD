@@ -1,10 +1,10 @@
 package com.example.gd.domain.repositories
 
 import com.example.gd.R
-import com.example.gd.domain.model.MyOrders
+import com.example.gd.domain.model.Order
 
 object MyOrdersDataDummy {
-    val myOrders = MyOrders(
+    /*val myOrders = Order(
         1,
         R.drawable.burger,
         "Шаверма классическая",
@@ -37,5 +37,5 @@ object MyOrdersDataDummy {
             name = "Шаверма XXXL",
             price = 6.25
         )
-    )
+    )*/
 }

@@ -10,5 +10,8 @@ data class User(
     var phone: String = "",
     var deliveryAddress: String = "",
     var registrationDate: String = "",
-    var loyaltyPoints: Int = 0
+    var loyaltyPoints: Int = 0,
+    var selectedPoint: String = "",
+    var favorites: List<String> = emptyList(),
+    var orderList: List<String> = emptyList()
 )

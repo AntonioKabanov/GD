@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.KeyboardArrowRight
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,13 +31,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.example.gd.R
 import com.example.gd.domain.model.Category
+import com.example.gd.domain.model.Product
+import com.example.gd.presentation.navigation.Screen
 import com.example.gd.presentation.Authentication.AuthenticationViewModel
 import com.example.gd.presentation.Authentication.Toast
 import com.example.gd.presentation.Categories.CategoryViewModel
+import com.example.gd.presentation.Products.ProductViewModel
 import com.example.gd.presentation.components.CategoryTabs
 import com.example.gd.presentation.components.TopAppBarHome
+import com.example.gd.presentation.screens.product_screen.ProductScreen
 import com.example.gd.ui.theme.colorBlack
 import com.example.gd.ui.theme.colorRedDark
 import com.example.gd.ui.theme.colorRedGrayLight
@@ -44,39 +51,99 @@ import com.example.gd.ui.theme.colorRedLite
 import com.example.gd.ui.theme.colorWhite
 import com.example.gd.util.Response
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
     navController: NavController,
     authViewModel: AuthenticationViewModel,
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(if (isSystemInDarkTheme()) Color.Black else colorWhite)
-            .verticalScroll(rememberScrollState())
-    ) {
-        Image(
-            modifier = Modifier
-                .fillMaxWidth()
-                .offset(0.dp, (-30).dp),
-            painter = painterResource(id = R.drawable.bg_main),
-            contentDescription = "Header Background",
-            contentScale = ContentScale.FillWidth
-        )
-        Column(
-            modifier = Modifier
-                .padding(20.dp)
-        ) {
-            TopAppBarHome()
-            Spacer(modifier = Modifier.height(30.dp))
-            Title()
-            Spacer(modifier = Modifier.height(20.dp))
-            Content()
-        }
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val coroutineScope = rememberCoroutineScope()
 
-    }
+    ModalDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Gray)
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Настройки",
+                        style = MaterialTheme.typography.h6,
+                        color = Color.White
+                    )
+                    IconButton(onClick = {
+                        coroutineScope.launch {
+                            drawerState.close()
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Close,
+                            contentDescription = "Закрыть",
+                            tint = Color.White
+                        )
+                    }
+                }
+                Divider()
+                Text(
+                    text = "Тех. поддержка",
+                    modifier = Modifier
+                        .clickable { navController.navigate(Screen.SupportScreenUser.route) }
+                        .padding(16.dp)
+                )
+                Text(
+                    text = "О приложении",
+                    modifier = Modifier
+                        .clickable { navController.navigate(Screen.AboutScreen.route) }
+                        .padding(16.dp)
+                )
+            }
+        },
+        content = {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(colorWhite)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Image(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .offset(0.dp, (-30).dp),
+                    painter = painterResource(id = R.drawable.bg_main),
+                    contentDescription = "Header Background",
+                    contentScale = ContentScale.FillWidth
+                )
+                Column(
+                    modifier = Modifier
+                        .padding(20.dp)
+                ) {
+                    TopAppBarHome(
+                        onDashboardClick = {
+                            coroutineScope.launch {
+                                drawerState.open()
+                            }
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(30.dp))
+                    Title()
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Content(navController)
+                }
+            }
+        }
+    )
 }
+
 
 @Composable
 fun Title() {
@@ -87,7 +154,7 @@ fun Title() {
     ) {
         Text(
             text = "Что бы вы хотели\n" +
-                    "съесть сегодня? \uD83D\uDE0B",
+                    "съесть сегодня?",
             color = colorBlack,
             style = MaterialTheme.typography.h6
         )
@@ -95,29 +162,38 @@ fun Title() {
 }
 
 @Composable
-fun Content() {
-    Column() {
-        Header()
+fun Content(navController: NavController) {
+    var selectedCategoryId by remember { mutableStateOf("") }
+    var searchQuery by remember { mutableStateOf("") }
+
+    Column {
+        Header(onSearchQueryChanged = { query ->
+            searchQuery = query
+        })
         Spacer(modifier = Modifier.height(16.dp))
-        CategorySection()
+        CategorySection(selectedCategoryId = { categoryId ->
+            selectedCategoryId = categoryId
+        })
         Spacer(modifier = Modifier.height(20.dp))
-        PopularSection()
+        PopularSection(
+            navController = navController,
+            categoryId = selectedCategoryId,
+            searchQuery = searchQuery
+        )
         Spacer(modifier = Modifier.height(20.dp))
-        OfferDealSection()
-
-
     }
 }
 
-
 @Composable
-fun Header() {
+fun Header(
+    onSearchQueryChanged: (String) -> Unit
+) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        var usersearch by remember { mutableStateOf("") }
+        var userSearch by remember { mutableStateOf("") }
 
         Card(
             modifier = Modifier.height(50.dp),
@@ -133,10 +209,13 @@ fun Header() {
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                 ),
-                value = usersearch,
+                value = userSearch,
                 shape = RoundedCornerShape(24.dp),
                 singleLine = true,
-                onValueChange = { usersearch = it },
+                onValueChange = {
+                    userSearch = it
+                    onSearchQueryChanged(it)
+                },
                 placeholder = {
                     Text(
                         text = "Поиск по меню",
@@ -157,7 +236,7 @@ fun Header() {
                             .clip(shape = CircleShape)
                             .background(colorRedDark)
                     ) {
-                        IconButton(onClick = { }) {
+                        IconButton(onClick = {  }) {
                             Icon(
                                 imageVector = Icons.Filled.FilterList,
                                 contentDescription = "",
@@ -169,19 +248,20 @@ fun Header() {
             )
         }
     }
-
 }
 
 @Composable
-fun CategorySection() {
+fun CategorySection(
+    selectedCategoryId: (String) -> Unit
+) {
     val categoryViewModel: CategoryViewModel = hiltViewModel()
-    var itemList = emptyList<Category>()
+    var categoryItemList = emptyList<Category>()
 
     categoryViewModel.getCategoryList()
     when(val response = categoryViewModel.getCategoryData.value) {
         is Response.Loading -> {}
         is Response.Success -> {
-            itemList = response.data
+            categoryItemList = response.data
         }
         is Response.Error -> {
             Toast(response.message)
@@ -189,14 +269,6 @@ fun CategorySection() {
     }
 
     Column() {
-        //val itemList = listOf("Бургеры", "Шаверма", "Хот-доги", "Бизнес-ланчи", "Роллы")
-        val categoryImagesList = listOf<Int>(
-            R.drawable.burger2,
-            R.drawable.pizza,
-            R.drawable.salad,
-            R.drawable.salad,
-            R.drawable.salad,
-            )
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -222,289 +294,189 @@ fun CategorySection() {
                     tint = colorRedDark
                 )
             }
-
-
         }
 
-        /*LazyRow(modifier = Modifier.fillMaxWidth(), content = {
-            items(itemList.size) { item ->
-                Box(
-                    modifier = Modifier
-                        .height(50.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(color = if (item == 0) colorRedDark else colorRedGrayLight),
-                    contentAlignment = Alignment.Center
-                ) {
-                    *//*Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 2.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {*//*
-                        *//*Image(
-                            painter = painterResource(categoryImagesList[item]),
-                            contentDescription = "",
-                            modifier = Modifier
-                                .size(60.dp, 60.dp)
-                                .padding(start = 20.dp),
-                            contentScale = ContentScale.Fit
-                        )*//*
-                        CategoryTabs(
-                            categories = ,
-                            selectedCategory =
-                        ) {
-
-                        }
-                    //}
-                }
-
-                Spacer(modifier = Modifier.width(10.dp))
-            }
-        })*/
-        if (itemList.isNotEmpty()) {
+        if (categoryItemList.isNotEmpty()) {
+            var selectedCategory by remember { mutableStateOf(categoryItemList.first()) }
             CategoryTabs(
-                categories = itemList,
-                selectedCategory = itemList.first(),
-                onCategorySelected = {}
+                categories = categoryItemList,
+                selectedCategory = selectedCategory,
+                onCategorySelected = { category ->
+                    selectedCategory = category
+                    if (category.name != "Всё")
+                        selectedCategoryId(category.id)
+                    else
+                        selectedCategoryId("")
+                }
+            )
+        }
+        else {
+            Text(
+                text = "Получение списка категорий..."
             )
         }
     }
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun PopularSection() {
-    Column() {
+fun PopularSection(
+    navController: NavController,
+    categoryId: String,
+    searchQuery: String
+) {
+    Column {
+        val productViewModel: ProductViewModel = hiltViewModel()
+        var productItemList by remember { mutableStateOf(emptyList<Product>()) }
 
-        val popularImagesList = listOf<Int>(
-            R.drawable.burger,
-            R.drawable.burger2,
-        )
-        val popularTitleNameList = listOf("Шаверма Грибная", "Гамбургер")
-        val popularSubTitleItemList = listOf("Burger King", "Shake Shack")
-        val popularPriceItemList = listOf("4.25", "3.45")
-        val popularPriceTagItemList = listOf("$ ", "$ ")
+        var isProductAdded by remember { mutableStateOf(false)}
 
-        Text(
-            text = "Популярное \uD83D\uDD25",
-            style = MaterialTheme.typography.h6,
-            color = colorBlack
-        )
+        LaunchedEffect(categoryId, searchQuery) {
+            if (categoryId.isEmpty()) {
+                productViewModel.getProductList()
+            } else {
+                productViewModel.getProductsByCategory(categoryId)
+            }
+        }
 
-        LazyRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp), content = {
-                items(popularImagesList.size) { item ->
-                    Box(
-                        modifier = Modifier
-                            .width(200.dp)
-                            .wrapContentHeight()
-                            .padding(10.dp)
-                            .clip(RoundedCornerShape(24.dp))
-                            .border(width = 1.dp, color = colorRedLite)
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 20.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Image(
-                                modifier = Modifier
-                                    .size(100.dp),
-                                painter = painterResource(popularImagesList[item]),
-                                contentDescription = "",
-                                contentScale = ContentScale.Fit
-                            )
-
-                            Text(
-                                text = popularTitleNameList[item],
-                                fontWeight = FontWeight.Bold,
-                                style = MaterialTheme.typography.h6,
-                                color = colorBlack
-                            )
-
-                            Text(
-                                text = popularSubTitleItemList[item],
-                                fontWeight = FontWeight.Normal,
-                                style = MaterialTheme.typography.button,
-                                color = Color.Gray
-                            )
-
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(20.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = buildAnnotatedString {
-                                        withStyle(
-                                            style = SpanStyle(
-                                                colorRedDark,
-                                                fontWeight = FontWeight.Bold
-                                            )
-                                        ) {
-                                            append(popularPriceTagItemList[item])
-                                        }
-                                        withStyle(
-                                            style = SpanStyle(
-                                                colorRedDark
-                                            )
-                                        ) {
-                                            append(popularPriceItemList[item])
-                                        }
-                                    },
-                                    style = MaterialTheme.typography.h6,
-
-
-                                    )
-
-
-                                Box(
-                                    modifier = Modifier
-                                        .clip(CircleShape)
-                                        .background(colorRedDark)
-                                        .padding(4.dp)
-                                        .clickable { },
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        modifier = Modifier.size(20.dp, 20.dp),
-                                        imageVector = Icons.Default.Add,
-                                        contentDescription = "Add",
-                                        tint = colorWhite
-                                    )
-                                }
-
-                            }
-                        }
-                    }
+        when (val response = productViewModel.getProductData.value) {
+            is Response.Loading -> {}
+            is Response.Success -> {
+                productItemList = response.data.filter { product ->
+                    product.name.contains(searchQuery, ignoreCase = true)
                 }
             }
-        )
+            is Response.Error -> {
+                Toast(response.message)
+            }
+        }
 
-    }
-}
+        when (val response = productViewModel.addProductInOrderData.value) {
+            is Response.Loading -> {}
+            is Response.Success -> {
 
-@Composable
-fun OfferDealSection() {
-    Column() {
-        val offerDealImagesList = listOf<Int>(
-            R.drawable.burger,
-            R.drawable.burger2,
-        )
-        val offerDealTitleNameList = listOf("Шаверма Грибная", "Гамбургер")
-        val offerDealSubTitleItemList = listOf("Burger King", "Shake Shack")
-        val offerDealPriceItemList = listOf("1.25", "1.45")
-        val offerDealPriceTagItemList = listOf("$ ", "$ ")
+                if (response.data) {
+                    Toast(message = "Товар добавлен в заказ")
+                }
+            }
+            is Response.Error -> {
+                Toast(response.message)
+            }
+        }
 
         Text(
-            text = "Предложения \uD83D\uDE04",
+            text = "Меню \uD83D\uDD25",
             style = MaterialTheme.typography.h6,
             color = colorBlack
         )
 
-        LazyRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp), content = {
-                items(offerDealImagesList.size) { item ->
-                    Box(
-                        modifier = Modifier
-                            .width(200.dp)
-                            .wrapContentHeight()
-                            .padding(10.dp)
-                            .clip(RoundedCornerShape(24.dp))
-                            .border(width = 1.dp, color = colorRedLite)
-                    ) {
-                        Column(
+        if (productItemList.isNotEmpty()) {
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                content = {
+                    items(productItemList.size) { item ->
+                        Box(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 20.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
+                                .width(200.dp)
+                                .wrapContentHeight()
+                                .padding(10.dp)
+                                .clip(RoundedCornerShape(24.dp))
+                                .border(width = 1.dp, color = Color.Gray)
+                                .clickable {
+                                    navController.currentBackStackEntry?.savedStateHandle?.set(
+                                        "productItem",
+                                        productItemList[item]
+                                    )
+                                    navController.navigate(Screen.ProductScreen.route)
+                                }
                         ) {
-                            Image(
-                                modifier = Modifier
-                                    .size(100.dp),
-                                painter = painterResource(offerDealImagesList[item]),
-                                contentDescription = "",
-                                contentScale = ContentScale.Fit
-                            )
-
-                            Text(
-                                text = offerDealTitleNameList[item],
-                                fontWeight = FontWeight.Bold,
-                                style = MaterialTheme.typography.h6,
-                                color = colorBlack
-                            )
-
-                            Text(
-                                text = offerDealSubTitleItemList[item],
-                                fontWeight = FontWeight.Normal,
-                                style = MaterialTheme.typography.button,
-                                color = Color.Gray
-                            )
-
-                            Row(
+                            Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(20.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
+                                    .padding(top = 20.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
                             ) {
-                                Text(
-                                    text = buildAnnotatedString {
-                                        withStyle(
-                                            style = SpanStyle(
-                                                colorRedDark,
-                                                fontWeight = FontWeight.Bold
-                                            )
-                                        ) {
-                                            append(offerDealPriceTagItemList[item])
-                                        }
-                                        withStyle(
-                                            style = SpanStyle(
-                                                colorRedDark
-                                            )
-                                        ) {
-                                            append(offerDealPriceItemList[item])
-                                        }
-                                    },
-                                    style = MaterialTheme.typography.h6,
+                                GlideImage(
+                                    modifier = Modifier
+                                        .size(120.dp),
+                                    model = productItemList[item].image,
+                                    contentDescription = "",
+                                    contentScale = ContentScale.Fit
                                 )
 
-                                Box(
-                                    modifier = Modifier
-                                        .clip(CircleShape)
-                                        .background(Color.Red)
-                                        .padding(4.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        modifier = Modifier.size(20.dp, 20.dp),
-                                        imageVector = Icons.Default.Add,
-                                        contentDescription = "Add",
-                                        tint = colorWhite
-                                    )
-                                }
+                                Text(
+                                    text = productItemList[item].name,
+                                    fontWeight = FontWeight.Bold,
+                                    style = MaterialTheme.typography.h6,
+                                    color = colorBlack,
+                                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                                )
 
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(20.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        text = buildAnnotatedString {
+                                            withStyle(
+                                                style = SpanStyle(
+                                                    colorRedDark,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            ) {
+                                                append(productItemList[item].price.toInt().toString())
+                                            }
+                                            withStyle(
+                                                style = SpanStyle(
+                                                    colorRedDark
+                                                )
+                                            ) {
+                                                append(" ₽")
+                                            }
+                                        },
+                                        style = MaterialTheme.typography.h6,
+                                    )
+
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(CircleShape)
+                                            .background(colorRedDark)
+                                            .padding(4.dp)
+                                            .clickable {
+                                                productViewModel.addProductInOrder(
+                                                    productId = productItemList[item].id
+                                                )
+                                            },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            modifier = Modifier.size(20.dp, 20.dp),
+                                            imageVector = Icons.Default.Add,
+                                            contentDescription = "Add",
+                                            tint = colorWhite
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
                 }
-            }
-        )
-        Spacer(modifier = Modifier.height(50.dp))
-
+            )
+        } else {
+            Text(
+                text = "Получение списка меню..."
+            )
+        }
     }
 }
+
 
 /*
 @Composable

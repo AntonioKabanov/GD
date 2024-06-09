@@ -19,17 +19,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.gd.ui.theme.colorBlack
 
 @Composable
-fun TopAppBarMyOrders() {
+fun TopAppBarMyOrders(
+    navController: NavController
+) {
 
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = { }) {
+        IconButton(onClick = {
+            navController.popBackStack()
+        }) {
             Icon(
                 imageVector = Icons.Outlined.ArrowBack,
                 contentDescription = "",
@@ -47,9 +52,9 @@ fun TopAppBarMyOrders() {
     }
 }
 
-@Composable
+/*@Composable
 @Preview
 fun TopAppBarMyOrdersPreview() {
     TopAppBarMyOrders()
-}
+}*/
 

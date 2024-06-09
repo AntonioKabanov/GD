@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.gd.R
-import com.example.gd.navigation.Screen
+import com.example.gd.presentation.navigation.Screen
 import com.example.gd.ui.theme.*
 
 @Composable

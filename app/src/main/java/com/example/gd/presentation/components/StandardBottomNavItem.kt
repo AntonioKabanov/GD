@@ -10,6 +10,10 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,23 +35,23 @@ import com.example.gd.ui.theme.colorRedDark
 fun RowScope.StandardBottomNavItem(
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
+    alertCount: Int? = null,
     contentDescription: String? = null,
     selected: Boolean = false,
-    alertCount: Int? = null,
     selectedColor: Color = colorRedDark,
     unselectedColor: Color = Color.Gray,
     enabled: Boolean = true,
     onClick: () -> Unit
 ) {
-    if (alertCount != null && alertCount < 0) {
-        throw IllegalArgumentException("Alert count can't be negative")
-    }
+
     val lineLength = animateFloatAsState(
         targetValue = if (selected) 1f else 0f,
         animationSpec = tween(
             durationMillis = 300
         )
     )
+    //var check = alertCount ?: 0
+    //val alertCountRem by remember { mutableIntStateOf(check) }
 
     BottomNavigationItem(
         selected = selected,
@@ -96,19 +100,21 @@ fun RowScope.StandardBottomNavItem(
                     } else {
                         alertCount.toString()
                     }
-                    Text(
-                        text = alertText,
-                        color = MaterialTheme.colors.onPrimary,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                        fontSize = 10.sp,
-                        modifier = Modifier
-                            .align(Alignment.TopCenter)
-                            .offset(10.dp)
-                            .size(15.dp)
-                            .clip(CircleShape)
-                            .background(colorRedDark)
-                    )
+                    if (alertCount != 0) {
+                        Text(
+                            text = alertText,
+                            color = MaterialTheme.colors.onPrimary,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                            fontSize = 10.sp,
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .offset(10.dp)
+                                .size(15.dp)
+                                .clip(CircleShape)
+                                .background(colorRedDark)
+                        )
+                    }
                 }
             }
         }

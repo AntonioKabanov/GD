@@ -1,12 +1,14 @@
 package com.example.gd.domain.model
 
 import com.example.gd.R
+import java.io.Serializable
 
 data class Product(
-    val id: Int = 0,
-    val ordersImageId: Int = R.drawable.burger,
-    val name: String = "",
-    val weight: String = "",
-    val calories: String = "",
-    val price: Double = 0.0,
-)
+    var id: String = "",
+    var image: String = "",
+    var name: String = "",
+    var weight: String = "",
+    var calories: String = "",
+    var price: Double = 0.0,
+    var categoryId: String = ""
+) : Serializable

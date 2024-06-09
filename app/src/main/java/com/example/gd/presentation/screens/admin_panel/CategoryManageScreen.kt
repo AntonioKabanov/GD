@@ -10,12 +10,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExposedDropdownMenuBox
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,6 +33,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.gd.domain.model.Category
 import com.example.gd.presentation.Authentication.AuthenticationViewModel
 import com.example.gd.presentation.Authentication.Toast
 import com.example.gd.presentation.Categories.CategoryViewModel
@@ -38,14 +41,19 @@ import com.example.gd.presentation.components.ManageButtonsComponent
 import com.example.gd.presentation.components.TopAppBarAdmin
 import com.example.gd.util.Response
 
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryManageScreen(
     navController: NavController,
     categoryViewModel: CategoryViewModel = hiltViewModel()
 ) {
+    var categoryItemList = emptyList<Category>()
+
     var addMenuShow by remember { mutableStateOf(false) }
     var editMenuShow by remember { mutableStateOf(false) }
     var deleteMenuShow by remember { mutableStateOf(false) }
+
+    var expanded by remember { mutableStateOf(false) }
 
     var categoryName by remember { mutableStateOf("") }
     var categoryPhotoUrl by remember { mutableStateOf("") }
@@ -141,11 +149,11 @@ fun CategoryManageScreen(
                         color = Color.White
                     )
                 }
-                when(val response = categoryViewModel.deleteCategoryData.value) {
+                when(val response = categoryViewModel.addCategoryData.value) {
                     is Response.Loading -> {}
                     is Response.Success -> {
                         if (response.data) {
-                            Toast(message = "Категория успешно удалена")
+                            Toast(message = "Категория успешно добавлена")
                         }
                     }
                     is Response.Error -> {
@@ -154,23 +162,61 @@ fun CategoryManageScreen(
                 }
             }
             if (deleteMenuShow) {
-                OutlinedTextField(
-                    value = categoryName,
-                    onValueChange = {
-                        categoryName = it
-                    },
-                    label = { Text("Наименование категории") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 5.dp)
-                )
+                categoryViewModel.getCategoryList()
+                when(val response = categoryViewModel.getCategoryData.value) {
+                    is Response.Loading -> {}
+                    is Response.Success -> {
+                        categoryItemList = response.data
+                    }
+                    is Response.Error -> {
+                        Toast(response.message)
+                    }
+                }
+
+               // val selectedCategoryListItem = if (categoryItemList.size > 1) categoryItemList[1].name else "Пусто"
+               // categoryName = selectedCategoryListItem
+
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it }
+                ) {
+                    OutlinedTextField(
+                        value = categoryName,
+                        onValueChange = {},
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        label = { Text("Список категорий") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        singleLine = true,
+                        readOnly = true,
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 5.dp)
+                    )
+                    if (categoryItemList.isNotEmpty() && categoryItemList.size > 1) {
+                        ExposedDropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            categoryItemList.forEach { item ->
+                                if (item.name != "Всё") {
+                                    DropdownMenuItem(
+                                        text = { Text(text = item.name) },
+                                        onClick = {
+                                            categoryName = item.name
+                                            expanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
                 Spacer(modifier = Modifier.height(20.dp))
                 TextButton(
                     onClick = {
-                        categoryViewModel.deleteNewCategory(categoryName)
+                        if (categoryItemList.size > 1)
+                            categoryViewModel.deleteNewCategory(categoryName)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -182,11 +228,11 @@ fun CategoryManageScreen(
                         color = Color.White
                     )
                 }
-                when(val response = categoryViewModel.addCategoryData.value) {
+                when(val response = categoryViewModel.deleteCategoryData.value) {
                     is Response.Loading -> {}
                     is Response.Success -> {
                         if (response.data) {
-                            Toast(message = "Категория успешно добавлена")
+                            Toast(message = "Категория успешно удалена")
                         }
                     }
                     is Response.Error -> {

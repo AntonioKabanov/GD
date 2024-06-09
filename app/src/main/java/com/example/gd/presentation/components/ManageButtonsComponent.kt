@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.gd.navigation.Screen
+import com.example.gd.presentation.navigation.Screen
 import com.example.gd.ui.theme.colorGray
 import com.example.gd.ui.theme.colorWhite
 

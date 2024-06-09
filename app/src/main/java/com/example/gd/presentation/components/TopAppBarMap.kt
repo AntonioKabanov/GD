@@ -14,49 +14,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.gd.ui.theme.colorBlack
 
 @Composable
-fun TopAppBarMap() {
+fun TopAppBarMap(navController: NavController) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = { }) {
+        IconButton(onClick = { navController.popBackStack() }) {
             Icon(
                 imageVector = Icons.Outlined.ArrowBack,
                 contentDescription = "",
                 tint = colorBlack
             )
-
         }
 
         Text(
-            text = "Отслеживание заказа",
+            text = "Оформление заказа",
             color = colorBlack,
-            style = MaterialTheme.typography.button
+            style = MaterialTheme.typography.h5,
+            modifier = Modifier.padding(start = 40.dp)
         )
-        BadgedBox(
-            badge = {
-                Badge { Text("4") }
-            },
-            modifier = Modifier
-                .padding(end = 20.dp)
-        ) {
-            Icon(
-                Icons.Outlined.Lock,
-                contentDescription = "Notification"
-            )
-
-        }
-
 
     }
-}
-
-@Composable
-@Preview
-fun TopAppBarMapPreview() {
-    TopAppBarMap()
 }

@@ -4,19 +4,28 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.gd.navigation.Navigation
-import com.example.gd.navigation.Screen
+import com.example.gd.presentation.Authentication.Toast
+import com.example.gd.presentation.Products.ProductViewModel
+import com.example.gd.presentation.navigation.Navigation
+import com.example.gd.presentation.navigation.Screen
 import com.example.gd.presentation.components.StandardScaffold
 import com.example.gd.ui.theme.GDTheme
+import com.example.gd.util.Response
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -32,6 +41,22 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun GDComposeUIMain() {
+        var alertCount by remember { mutableIntStateOf(0) }
+        val productViewModel: ProductViewModel = hiltViewModel()
+        LaunchedEffect(key1 = true) {
+            productViewModel.getOrderById()
+        }
+        when (val response = productViewModel.getOrderData.value) {
+            is Response.Loading -> {}
+            is Response.Error -> {
+                Toast(message = response.message)
+            }
+            is Response.Success -> {
+                if (response.data != null) {
+                    alertCount = response.data.size
+                }
+            }
+        }
         GDTheme {
             androidx.compose.material.Surface(
                 color = androidx.compose.material.MaterialTheme.colors.background,
@@ -50,9 +75,12 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     onFabClick = {
                         navController.navigate(Screen.SearchScreen.route)
-                    }
+                    },
+                    alertCount = alertCount
                 ) {
-                    Navigation(navController)
+                    Navigation(navController, checkAlertCount = {
+                        alertCount = it
+                    })
                 }
             }
 

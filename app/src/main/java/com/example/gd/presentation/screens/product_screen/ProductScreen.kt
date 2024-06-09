@@ -21,14 +21,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.example.gd.R
 import com.example.gd.domain.model.Product
+import com.example.gd.presentation.navigation.Screen
+import com.example.gd.presentation.Products.ProductViewModel
 import com.example.gd.presentation.components.AboutProductSection
 import com.example.gd.presentation.components.PriceProductSection
 import com.example.gd.presentation.components.TopAppBarProduct
 import com.example.gd.ui.theme.colorGray
 
+
+
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ProductScreen(
     navController: NavController,
@@ -42,17 +50,20 @@ fun ProductScreen(
     ) {
         TopAppBarProduct(
             onBackClick = {
-                navController.popBackStack()
+                navController.navigate(Screen.HomeScreen.route) {
+                    popUpTo(Screen.ProductScreen.route) {
+                        inclusive = true
+                    }
+                }
             },
             modifier = Modifier.padding(bottom = 5.dp)
         )
-        Image(
-            painter = painterResource(product.ordersImageId),
+        GlideImage(
+            model = product.image,
             contentDescription = contentDescription,
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.LightGray, RoundedCornerShape(8.dp))
-                .size(300.dp)
+                .size(320.dp)
         )
         Text(
             text = product.name,
@@ -80,7 +91,8 @@ fun ProductScreen(
         )
         Spacer(modifier = Modifier.weight(1f))
         PriceProductSection(
-            price = product.price.toString(),
+            productId = product.id,
+            productPrice = product.price.toString(),
             modifier = Modifier.padding(bottom = 8.dp)
         )
     }

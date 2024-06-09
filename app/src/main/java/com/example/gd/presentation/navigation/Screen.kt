@@ -1,4 +1,4 @@
-package com.example.gd.navigation
+package com.example.gd.presentation.navigation
 
 sealed class Screen(val route: String) {
     object SplashScreen : Screen("splash_screen")
@@ -19,5 +19,11 @@ sealed class Screen(val route: String) {
     object UserManageScreen : Screen("user_manage_screen")
     object ProductManageScreen : Screen("product_manage_screen")
     object ProductScreen : Screen("product_screen")
+    object OrderHistory : Screen("order_history")
+    object ManageOrderScreen : Screen("manage_order_screen")
+    object SupportScreenUser : Screen("support_screen_user")
+    object SupportScreenAdmin : Screen("support_screen_admin")
+    object AboutScreen : Screen("about_screen")
+
 
 }

@@ -29,7 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.gd.navigation.Screen
+import com.example.gd.presentation.navigation.Screen
 import com.example.gd.presentation.Authentication.AuthenticationViewModel
 import com.example.gd.presentation.components.TopAppBarAdmin
 import com.example.gd.ui.theme.colorWhite
@@ -94,6 +94,21 @@ fun AdminPanelScreen(
         ) {
             Text(
                 text = "Управление пользователями",
+                style = MaterialTheme.typography.button,
+                color = colorWhite
+            )
+        }
+        Spacer(modifier = Modifier.height(5.dp))
+        TextButton(
+            onClick = {
+                navController.navigate(Screen.SupportScreenAdmin.route)
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Red, RoundedCornerShape(10.dp))
+        ) {
+            Text(
+                text = "Тех. поддержка",
                 style = MaterialTheme.typography.button,
                 color = colorWhite
             )

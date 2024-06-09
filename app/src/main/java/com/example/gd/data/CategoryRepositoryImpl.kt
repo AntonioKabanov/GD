@@ -21,6 +21,7 @@ class CategoryRepositoryImpl @Inject constructor(
     override suspend fun getCategoryList(): Flow<Response<List<Category>>> = callbackFlow {
 
         val snapShotListener = database.collection(Constants.COLLECTION_NAME_CATEGORIES)
+            .orderBy("name")
             .addSnapshotListener {snapshot, error ->
                 val response = if(snapshot != null) {
                     val categories = snapshot.toObjects(Category::class.java)
@@ -59,7 +60,7 @@ class CategoryRepositoryImpl @Inject constructor(
                 emit(Response.Success(operationSuccessful))
             }
             else {
-                emit(Response.Error("Ошибка при обновлении данных пользователя"))
+                emit(Response.Error("Ошибка при добавлении категории"))
             }
         }
         catch (e: Exception) {

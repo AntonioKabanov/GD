@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.gd.R
-import com.example.gd.navigation.Screen
+import com.example.gd.presentation.navigation.Screen
 import com.example.gd.presentation.Authentication.AuthenticationViewModel
 import kotlinx.coroutines.delay
 

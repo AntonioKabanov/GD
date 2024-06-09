@@ -18,24 +18,44 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.gd.R
-import com.example.gd.navigation.Screen
+import com.example.gd.domain.model.Product
+import com.example.gd.presentation.navigation.Screen
+import com.example.gd.presentation.Authentication.Toast
+import com.example.gd.presentation.Products.ProductViewModel
 import com.example.gd.ui.theme.colorBlack
 import com.example.gd.ui.theme.colorGray
 import com.example.gd.ui.theme.colorWhite
+import com.example.gd.util.Response
 
 @Composable
 fun PriceProductSection(
-    price: String,
+    productId: String,
+    productPrice: String,
     modifier: Modifier = Modifier
 ) {
+    val productViewModel: ProductViewModel = hiltViewModel()
+    when(val response = productViewModel.addProductInOrderData.value) {
+        is Response.Loading -> {}
+        is Response.Success -> {
+            if(response.data) {
+                Toast(message = "Товар добавлен в заказ")
+            }
+        }
+        is Response.Error -> {
+            Toast(response.message)
+        }
+    }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier.fillMaxWidth()
     ) {
         TextButton(
-            onClick = {},
+            onClick = {
+                productViewModel.addProductInOrder(productId = productId)
+            },
             modifier = Modifier
                 .background(colorGray, RoundedCornerShape(10.dp))
                 .border(1.dp, Color.DarkGray, RoundedCornerShape(10.dp))
@@ -48,7 +68,7 @@ fun PriceProductSection(
                     .padding(end = 5.dp)
             )
             Text(
-                text = "Добавить ($price руб)",
+                text = "Добавить ($productPrice руб)",
                 style = MaterialTheme.typography.button,
                 color = Color.Black
             )
@@ -75,10 +95,11 @@ fun PriceProductSection(
     }
 }
 
+/*
 @Composable
 @Preview(showBackground = true)
 fun PriceProductSectionPreview() {
     PriceProductSection(
         price = 199.0.toString()
     )
-}
+}*/

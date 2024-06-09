@@ -52,7 +52,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.gd.R
-import com.example.gd.navigation.Screen
+import com.example.gd.presentation.navigation.Screen
 import com.example.gd.presentation.Authentication.AuthenticationViewModel
 import com.example.gd.presentation.Authentication.Toast
 import com.example.gd.presentation.components.ProfileHeader
@@ -78,7 +78,7 @@ fun ProfileScreen(
     var phone by remember { mutableStateOf("") }
     var registrationDate by remember { mutableStateOf("") }
     var deliveryAddress by remember { mutableStateOf("") }
-
+    var loyaltyPoints by remember { mutableStateOf("") }
     var isEditOpen by remember { mutableStateOf(false) }
     var isFieldChanged by remember { mutableStateOf(false) }
     val unknownUser = "user@${userId.take(5)}"
@@ -105,7 +105,7 @@ fun ProfileScreen(
             Toast(message = response.message)
         }
     }
-    //authViewModel.signOut()
+
     userViewModel.getUserInfo()
     when(val response = userViewModel.getUserData.value) {
         is Response.Loading -> {}
@@ -123,6 +123,7 @@ fun ProfileScreen(
                     phone = response.data.phone
                     registrationDate = response.data.registrationDate
                     deliveryAddress = response.data.deliveryAddress
+                    loyaltyPoints = response.data.loyaltyPoints.toString()
                 }
             }
         }
@@ -131,7 +132,7 @@ fun ProfileScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(if (isSystemInDarkTheme()) Color.Black else colorWhite)
+            .background(colorWhite)
             .verticalScroll(rememberScrollState())
     ) {
         Column(
@@ -221,6 +222,12 @@ fun ProfileScreen(
                     imageResource = R.drawable.baseline_access_time_24,
                     contentDescription = null,
                     text = registrationDate.ifEmpty { defaultField },
+                    modifier = Modifier.padding(start = 20.dp)
+                )
+                ProfileItem(
+                    imageResource = R.drawable.baseline_monetization_on_24,
+                    contentDescription = null,
+                    text = loyaltyPoints,
                     modifier = Modifier.padding(start = 20.dp)
                 )
             }
@@ -328,6 +335,23 @@ fun ProfileScreen(
                     ) {
                         Text(
                             text = "Админ-панель",
+                            style = MaterialTheme.typography.button,
+                            color = colorWhite
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+                if(userRole == Constants.ROLE_MANAGER) {
+                    TextButton(
+                        onClick = {
+                            navController.navigate(Screen.ManageOrderScreen.route)
+                        },
+                        modifier = Modifier
+                            .width(310.dp)
+                            .background(Color.Red, RoundedCornerShape(10.dp))
+                    ) {
+                        Text(
+                            text = "Панель менеджера",
                             style = MaterialTheme.typography.button,
                             color = colorWhite
                         )

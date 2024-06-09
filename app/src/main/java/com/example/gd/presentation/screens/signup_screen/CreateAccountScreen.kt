@@ -23,10 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.gd.R
-import com.example.gd.navigation.Screen
+import com.example.gd.presentation.navigation.Screen
 import com.example.gd.presentation.Authentication.AuthenticationViewModel
 import com.example.gd.presentation.Authentication.Toast
 import com.example.gd.ui.theme.colorBlack
+import com.example.gd.ui.theme.colorGray
 import com.example.gd.ui.theme.colorPrimary
 import com.example.gd.ui.theme.colorRedLite
 import com.example.gd.ui.theme.colorWhite
@@ -46,7 +47,7 @@ fun CreateAccountScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(if (isSystemInDarkTheme()) Color.Black else colorPrimary)
+            .background(colorGray)
             .verticalScroll(rememberScrollState()),
     ) {
         Column(
@@ -58,7 +59,7 @@ fun CreateAccountScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                painter = painterResource(id = R.drawable.gd_logo),
                 contentDescription = "LoginScreen Logo",
                 modifier = Modifier
                     .width(250.dp)

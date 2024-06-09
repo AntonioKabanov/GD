@@ -184,7 +184,7 @@ fun UserManageScreen(
                         onValueChange = {},
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         label = { Text("Роль") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                         singleLine = true,
                         readOnly = true,
                         shape = RoundedCornerShape(10.dp),
@@ -235,7 +235,7 @@ fun UserManageScreen(
                         userEmail = it
                     },
                     label = { Text("Email целевого пользователя") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     singleLine = true,
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier
@@ -248,7 +248,7 @@ fun UserManageScreen(
                         userName = it
                     },
                     label = { Text("Имя пользователя") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true,
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier
@@ -261,7 +261,7 @@ fun UserManageScreen(
                         userPhone = it
                     },
                     label = { Text("Телефон") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     singleLine = true,
                     visualTransformation = PasswordVisualTransformation(),
                     shape = RoundedCornerShape(10.dp),
@@ -275,7 +275,7 @@ fun UserManageScreen(
                         deliveryAddress = it
                     },
                     label = { Text("Адрес доставки") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true,
                     visualTransformation = PasswordVisualTransformation(),
                     shape = RoundedCornerShape(10.dp),
@@ -292,7 +292,7 @@ fun UserManageScreen(
                         onValueChange = {},
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         label = { Text("Роль") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                         singleLine = true,
                         readOnly = true,
                         shape = RoundedCornerShape(10.dp),

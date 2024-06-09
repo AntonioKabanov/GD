@@ -27,7 +27,7 @@ fun BookmarkSaveScreen(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(if (isSystemInDarkTheme()) Color.Black else colorWhite)
+            .background( colorWhite)
             .verticalScroll(rememberScrollState())
     ) {
         Column(
