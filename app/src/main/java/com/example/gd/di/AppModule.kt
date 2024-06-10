@@ -42,6 +42,7 @@ import com.example.gd.domain.use_cases.PointUseCases.SetPoint
 import com.example.gd.domain.use_cases.ProductUseCases.AddProduct
 import com.example.gd.domain.use_cases.ProductUseCases.AddProductInFavorite
 import com.example.gd.domain.use_cases.ProductUseCases.AddProductInOrder
+import com.example.gd.domain.use_cases.ProductUseCases.DeleteFromFavorite
 import com.example.gd.domain.use_cases.ProductUseCases.DeleteFromOrder
 import com.example.gd.domain.use_cases.ProductUseCases.DeleteProduct
 import com.example.gd.domain.use_cases.ProductUseCases.GetFavoriteById
@@ -56,6 +57,7 @@ import com.example.gd.domain.use_cases.SupportUseCases.SendMessage
 import com.example.gd.domain.use_cases.SupportUseCases.SupportUseCases
 import com.example.gd.domain.use_cases.UserUseCases.GetUserDetails
 import com.example.gd.domain.use_cases.UserUseCases.SetUserDetails
+import com.example.gd.domain.use_cases.UserUseCases.SetUserPhoto
 import com.example.gd.domain.use_cases.UserUseCases.UserUseCases
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -108,7 +110,8 @@ object AppModule {
     @Singleton
     fun provideUserUseCases(repository: UserRepository) = UserUseCases(
         getUserDetails = GetUserDetails(repository = repository),
-        setUserDetails = SetUserDetails(repository = repository)
+        setUserDetails = SetUserDetails(repository = repository),
+        setUserPhoto = SetUserPhoto(repository = repository)
     )
 
     @Provides
@@ -154,7 +157,8 @@ object AppModule {
         getOrderById = GetOrderById(repository = repository),
         getProductList = GetProductList(repository = repository),
         getProductsByCategory = GetProductsByCategory(repository = repository),
-        deleteFromOrder = DeleteFromOrder(repository = repository)
+        deleteFromOrder = DeleteFromOrder(repository = repository),
+        deleteFromFavorite = DeleteFromFavorite(repository = repository)
     )
 
     @Provides

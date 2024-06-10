@@ -8,15 +8,19 @@ import com.example.gd.domain.model.Product
 import com.example.gd.domain.repositories.OrderRepository
 import com.example.gd.util.Constants
 import com.example.gd.util.Response
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.Date
 import javax.inject.Inject
 
 class OrderRepositoryImpl @Inject constructor(
@@ -27,6 +31,7 @@ class OrderRepositoryImpl @Inject constructor(
     // ФУНКЦИЯ ПОЛУЧЕНИЯ СПИСКА ВСЕХ ЗАКАЗОВ ДЛЯ МЕНЕДЖЕРА
     override suspend fun getOrderList(): Flow<Response<List<Order>>> = callbackFlow {
         val snapShotListener = database.collection(Constants.COLLECTION_NAME_ORDERS)
+            .orderBy("timestamp", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, error ->
                 // Если нет ошибки и есть данные, преобразуем их в список заказов
                 val response = if (snapshot != null) {
@@ -50,6 +55,7 @@ class OrderRepositoryImpl @Inject constructor(
     override suspend fun getOrderListByUser(userid: String) = callbackFlow {
         val snapShotListener = database.collection(Constants.COLLECTION_NAME_ORDERS)
             .whereEqualTo("userid", userid)
+            .orderBy("timestamp", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, error ->
                 // Если нет ошибки и есть данные, преобразуем их в список заказов
                 val response = if (snapshot != null) {
@@ -87,6 +93,8 @@ class OrderRepositoryImpl @Inject constructor(
             // Генерация уникального идентификатора заказа
             val orderid = database.collection(Constants.COLLECTION_NAME_ORDERS).document().id
             val productnames = arrayListOf<String>()
+            val createdAt = SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(Date())
+            val timestamp = Timestamp.now()
 
             // Расчет баллов лояльности
             val loyaltyPoints = totalPrice / 100
@@ -104,6 +112,8 @@ class OrderRepositoryImpl @Inject constructor(
                 orderType = orderType,
                 deliveryAddress = deliveryAddress,
                 pointAddress = pointAddress,
+                createdAt = createdAt,
+                timestamp = timestamp,
                 status = Constants.ORDER_CREATED,
                 totalPrice = totalPrice
             )

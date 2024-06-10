@@ -25,6 +25,9 @@ class UserViewModel @Inject constructor(
     private val _setUserData = mutableStateOf<Response<Boolean>>(Response.Success(false))
     val setUserData: State<Response<Boolean>> = _setUserData
 
+    private val _setUserPhoto = mutableStateOf<Response<Boolean>>(Response.Success(false))
+    val setUserPhoto: State<Response<Boolean>> = _setUserPhoto
+
     /*init {
         getUserInfo()
     }*/
@@ -48,6 +51,19 @@ class UserViewModel @Inject constructor(
                     deliveryAddress = deliveryAddress
                 ).collect {
                     _setUserData.value = it
+                }
+            }
+        }
+    }
+
+    fun setUserPhoto(photo: String) {
+        if(userid != null) {
+            viewModelScope.launch {
+                userUseCases.setUserPhoto(
+                    userid = userid,
+                    photo = photo
+                ).collect {
+                    _setUserPhoto.value = it
                 }
             }
         }

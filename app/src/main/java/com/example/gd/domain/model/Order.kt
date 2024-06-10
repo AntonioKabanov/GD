@@ -1,6 +1,7 @@
 package com.example.gd.domain.model
 
 import com.example.gd.util.Constants
+import com.google.firebase.Timestamp
 import java.io.Serializable
 
 data class Order(
@@ -12,5 +13,7 @@ data class Order(
     var deliveryAddress: String = "",
     var pointAddress: String = "",
     var status: String = Constants.ORDER_CREATED,
+    var timestamp: Timestamp = Timestamp.now(),
+    var createdAt: String = "",
     var totalPrice: Double = 0.0
 ) : Serializable

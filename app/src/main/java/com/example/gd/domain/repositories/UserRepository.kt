@@ -12,4 +12,5 @@ interface UserRepository {
         phone: String,
         deliveryAddress: String,
     ) : Flow<Response<Boolean>>
+    suspend fun setUserPhoto(userid: String, photo: String): Flow<Response<Boolean>>
 }

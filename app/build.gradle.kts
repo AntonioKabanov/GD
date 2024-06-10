@@ -95,7 +95,7 @@ dependencies {
     implementation("androidx.paging:paging-compose:1.0.0-alpha14")
 
     //Coil Image
-    implementation("io.coil-kt:coil-compose:1.4.0")
+    implementation("io.coil-kt:coil-compose:2.6.0")
 
     //glide
     implementation("com.github.bumptech.glide:glide:4.12.0")

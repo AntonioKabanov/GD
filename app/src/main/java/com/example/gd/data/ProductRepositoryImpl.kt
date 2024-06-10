@@ -104,8 +104,33 @@ class ProductRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getFavoriteById(userid: String): Flow<Response<List<Product>>> {
-        TODO("Not yet implemented")
+    override suspend fun getFavoriteById(userid: String): Flow<Response<List<Product>>> = callbackFlow {
+        val productsId = try {
+            val userDoc = database.collection(Constants.COLLECTION_NAME_USERS).document(userid).get().await()
+            userDoc.data?.get("favorites") as? List<String> ?: emptyList()  // Return empty list if orderList is null
+        } catch (e: Exception) {
+            //emit(Response.Error(e.localizedMessage ?: "An unexpected error occurred"))
+            return@callbackFlow // Exit the coroutine if there's an error
+        }
+
+        var productListener: ListenerRegistration? = null
+        if (productsId.isNotEmpty()) {
+            val productList = mutableListOf<Product>()
+            productListener = database.collection(Constants.COLLECTION_NAME_PRODUCTS)
+                .whereIn(FieldPath.documentId(), productsId)
+                .addSnapshotListener { snapshot, error ->
+                    val response = if (snapshot != null) {
+                        val products = snapshot.toObjects(Product::class.java)
+                        productList.clear() // Clear existing products before adding new ones
+                        productList.addAll(products)
+                        Response.Success(productList)
+                    } else {
+                        Response.Error(error?.message ?: error.toString())
+                    }
+                    trySend(response)
+                }
+        }
+        awaitClose { productListener?.remove() }
     }
 
     override suspend fun getOrderById(userid: String): Flow<Response<List<Product>>> = callbackFlow {
@@ -137,8 +162,36 @@ class ProductRepositoryImpl @Inject constructor(
         awaitClose { productListener?.remove() }
     }
 
-    override suspend fun addProductInFavorite(productid: String): Flow<Response<Boolean>> {
-        TODO("Not yet implemented")
+    override suspend fun addProductInFavorite(
+        productid: String,
+        userid: String
+    ): Flow<Response<Boolean>> = flow {
+        operationSuccessful = false
+        emit(Response.Loading)
+        try {
+            val favList = arrayListOf<String>()
+            favList.add(productid)
+
+            database.collection(Constants.COLLECTION_NAME_USERS)
+                .document(userid)
+                .get()
+                .addOnSuccessListener {
+                    database.collection(Constants.COLLECTION_NAME_USERS)
+                        .document(userid)
+                        .update("favorites", FieldValue.arrayUnion(productid))
+                    operationSuccessful = true
+                }.await()
+
+            if(operationSuccessful) {
+                emit(Response.Success(operationSuccessful))
+            }
+            else {
+                emit(Response.Error("Ошибка при добавлении в избранное"))
+            }
+        }
+        catch (e: Exception) {
+            emit(Response.Error(e.localizedMessage?:"Непредвиденная ошибка"))
+        }
     }
 
     override suspend fun addProductInOrder(productid: String, userid: String): Flow<Response<Boolean>> = flow {
@@ -216,6 +269,36 @@ class ProductRepositoryImpl @Inject constructor(
                 emit(Response.Success(operationSuccessful))
             } else {
                 emit(Response.Error("Ошибка при удалении товара"))
+            }
+
+        } catch (e: Exception) {
+            emit(Response.Error(e.localizedMessage ?: "Непредвиденная ошибка"))
+        }
+    }
+
+    override suspend fun deleteFromFavorite(
+        productid: String,
+        userid: String
+    ): Flow<Response<Boolean>> = flow {
+        operationSuccessful = false
+        emit(Response.Loading)
+        try {
+            val userDoc = database.collection(Constants.COLLECTION_NAME_USERS)
+                .document(userid)
+                .get()
+                .await()
+
+            val favList = userDoc.get("favorites") as? MutableList<String> ?: mutableListOf()
+
+            if (favList.remove(productid)) {
+                database.collection(Constants.COLLECTION_NAME_USERS)
+                    .document(userid)
+                    .update("favorites", favList)
+                    .await()
+
+                emit(Response.Success(operationSuccessful))
+            } else {
+                emit(Response.Error("Ошибка при удалении из избранного"))
             }
 
         } catch (e: Exception) {

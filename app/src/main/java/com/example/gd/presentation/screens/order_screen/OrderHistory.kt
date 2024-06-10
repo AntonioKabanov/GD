@@ -40,6 +40,9 @@ import com.example.gd.presentation.Authentication.Toast
 import com.example.gd.presentation.Products.OrderViewModel
 import com.example.gd.presentation.components.TopAppBarMap
 import com.example.gd.presentation.components.TopAppBarMyOrders
+import com.example.gd.ui.theme.colorRedGrayLight
+import com.example.gd.ui.theme.colorRedLite
+import com.example.gd.ui.theme.colorRedWhite
 import com.example.gd.ui.theme.colorWhite
 import com.example.gd.util.Constants
 import com.example.gd.util.Response
@@ -89,11 +92,16 @@ fun OrderHistory(
                     ),
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
-
-                LazyColumn {
-                    items(orderList) { order ->
-                        OrderCard(order = order)
+                if (orderList.isNotEmpty()) {
+                    LazyColumn {
+                        items(orderList) { order ->
+                            OrderCard(order = order)
+                        }
                     }
+                } else {
+                    Text(
+                        text = "История заказов пуста"
+                    )
                 }
             }
         }
@@ -110,12 +118,16 @@ fun OrderCard(order: Order) {
         Constants.ORDER_FINISH -> Color.Blue
         else -> {Color.Gray}
     }
+    val cardColor: Color = when(order.status) {
+        Constants.ORDER_CREATED -> colorRedWhite
+        else -> Color.LightGray
+    }
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
         shape = RoundedCornerShape(8.dp),
-        backgroundColor = Color.LightGray
+        backgroundColor = cardColor
     ) {
         Column(
             modifier = Modifier
@@ -123,7 +135,7 @@ fun OrderCard(order: Order) {
                 .fillMaxWidth()
         ) {
             Text(
-                text = "Заказ № ${order.id.take(4)}",
+                text = "Заказ № ${order.id.take(4)} от ${order.createdAt}",
                 style = TextStyle(
                     fontSize = 20.sp,
                     color = Color.Black,

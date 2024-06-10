@@ -17,9 +17,10 @@ interface ProductRepository {
     suspend fun getFavoriteById(userid: String): Flow<Response<List<Product>>>
     suspend fun getOrderById(userid: String): Flow<Response<List<Product>>>
     suspend fun getProductsByCategory(categoryid: String): Flow<Response<List<Product>>>
-    suspend fun addProductInFavorite(productid: String): Flow<Response<Boolean>>
+    suspend fun addProductInFavorite(productid: String, userid: String): Flow<Response<Boolean>>
     suspend fun addProductInOrder(productid: String, userid: String): Flow<Response<Boolean>>
     suspend fun deleteProduct(productName: String): Flow<Response<Boolean>>
     suspend fun deleteFromOrder(productid: String, userid: String): Flow<Response<Boolean>>
+    suspend fun deleteFromFavorite(productid: String, userid: String): Flow<Response<Boolean>>
 
 }

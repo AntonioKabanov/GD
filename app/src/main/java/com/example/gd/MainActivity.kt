@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
     fun GDComposeUIMain() {
         var alertCount by remember { mutableIntStateOf(0) }
         val productViewModel: ProductViewModel = hiltViewModel()
-        LaunchedEffect(key1 = true) {
+        LaunchedEffect(key1 = productViewModel.addProductInOrderData.value) {
             productViewModel.getOrderById()
         }
         when (val response = productViewModel.getOrderData.value) {

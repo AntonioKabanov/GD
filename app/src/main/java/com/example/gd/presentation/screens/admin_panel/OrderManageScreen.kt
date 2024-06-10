@@ -40,9 +40,11 @@ import androidx.navigation.NavController
 import com.example.gd.domain.model.Order
 import com.example.gd.presentation.Authentication.Toast
 import com.example.gd.presentation.Products.OrderViewModel
+import com.example.gd.presentation.Products.PointViewModel
 import com.example.gd.presentation.components.TopAppBarManager
 import com.example.gd.presentation.components.TopAppBarMap
 import com.example.gd.presentation.components.TopAppBarMyOrders
+import com.example.gd.ui.theme.colorRedWhite
 import com.example.gd.ui.theme.colorWhite
 import com.example.gd.util.Constants
 import com.example.gd.util.Response
@@ -51,11 +53,28 @@ import com.example.gd.util.Response
 @Composable
 fun OrderManageScreen(
     navController: NavController,
-    orderViewModel: OrderViewModel = hiltViewModel()
+    orderViewModel: OrderViewModel = hiltViewModel(),
+    pointViewModel: PointViewModel = hiltViewModel()
 ) {
     orderViewModel.getOrderList()
 
     var orderList by remember { mutableStateOf(emptyList<Order>()) }
+    var pointAddress by remember { mutableStateOf("") }
+
+    pointViewModel.getPointByUser()
+    when (val response = pointViewModel.getCurrentPointData.value) {
+        is Response.Loading -> {
+            CircularProgressIndicator()
+        }
+        is Response.Error -> {
+            Toast(message = response.message)
+        }
+        is Response.Success -> {
+            if (response.data != null) {
+                pointAddress = response.data.pointAddress
+            }
+        }
+    }
 
     when (val response = orderViewModel.getOrderData.value) {
         is Response.Loading -> {
@@ -111,11 +130,22 @@ fun OrderManageScreen(
             ) {
                 LazyColumn {
                     items(orderList) { order ->
-                        OrderCard(order = order,
-                            onAccept = { orderViewModel.acceptOrder(order.id, status = Constants.ORDER_ACCEPT) },
-                            onReject = { orderViewModel.cancelOrder(order.id, status = Constants.ORDER_CANCEL) },
-                            onFinish = { orderViewModel.cancelOrder(order.id, status = Constants.ORDER_FINISH) }
-                        )
+                        if (order.orderType == Constants.GET_IN_POINT) {
+                            if (order.pointAddress == pointAddress) {
+                                OrderCard(order = order,
+                                    onAccept = { orderViewModel.acceptOrder(order.id, status = Constants.ORDER_ACCEPT) },
+                                    onReject = { orderViewModel.cancelOrder(order.id, status = Constants.ORDER_CANCEL) },
+                                    onFinish = { orderViewModel.acceptOrder(order.id, status = Constants.ORDER_FINISH) }
+                                )
+                            }
+                        }
+                        else {
+                            OrderCard(order = order,
+                                onAccept = { orderViewModel.acceptOrder(order.id, status = Constants.ORDER_ACCEPT) },
+                                onReject = { orderViewModel.cancelOrder(order.id, status = Constants.ORDER_CANCEL) },
+                                onFinish = { orderViewModel.acceptOrder(order.id, status = Constants.ORDER_FINISH) }
+                            )
+                        }
                     }
                 }
             }
@@ -129,15 +159,21 @@ fun OrderCard(order: Order, onAccept: () -> Unit, onReject: () -> Unit, onFinish
         Constants.ORDER_CREATED -> Color.Gray
         Constants.ORDER_ACCEPT -> Color.Blue
         Constants.ORDER_CANCEL -> Color.Red
-        Constants.ORDER_FINISH -> Color.Cyan
+        Constants.ORDER_FINISH -> Color.Blue
         else -> {Color.Gray}
     }
+
+    val cardColor: Color = when(order.status) {
+        Constants.ORDER_CREATED -> colorRedWhite
+        else -> Color.LightGray
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
         shape = RoundedCornerShape(8.dp),
-        backgroundColor = if (isSystemInDarkTheme()) Color.DarkGray else Color.LightGray
+        backgroundColor = cardColor
     ) {
         Column(
             modifier = Modifier
@@ -145,7 +181,7 @@ fun OrderCard(order: Order, onAccept: () -> Unit, onReject: () -> Unit, onFinish
                 .fillMaxWidth()
         ) {
             Text(
-                text = "Заказ № ${order.id.take(4)}",
+                text = "Заказ № ${order.id.take(4)} от ${order.createdAt}",
                 style = TextStyle(
                     fontSize = 20.sp,
                     color = if (isSystemInDarkTheme()) Color.White else Color.Black,

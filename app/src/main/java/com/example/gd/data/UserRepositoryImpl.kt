@@ -65,4 +65,27 @@ class UserRepositoryImpl @Inject constructor(
             emit(Response.Error(e.localizedMessage?:"Непредвиденная ошибка"))
         }
     }
+
+    override suspend fun setUserPhoto(userid: String, photo: String): Flow<Response<Boolean>> = flow {
+        emit(Response.Loading)
+        operationSuccessul = false
+        try {
+            val userObj = mutableMapOf<String, String>()
+            userObj["imageUrl"] = photo
+            database.collection(Constants.COLLECTION_NAME_USERS)
+                .document(userid)
+                .update(userObj as Map<String, Any>)
+                .addOnSuccessListener { operationSuccessul = true }.await()
+
+            if(operationSuccessul) {
+                emit(Response.Success(operationSuccessul))
+            }
+            else {
+                emit(Response.Error("Ошибка при обновлении фото"))
+            }
+        }
+        catch (e: Exception) {
+            emit(Response.Error(e.localizedMessage?:"Непредвиденная ошибка"))
+        }
+    }
 }

@@ -9,5 +9,6 @@ data class ProductUseCases(
     val getOrderById: GetOrderById,
     val getProductList: GetProductList,
     val getProductsByCategory: GetProductsByCategory,
-    val deleteFromOrder: DeleteFromOrder
+    val deleteFromOrder: DeleteFromOrder,
+    val deleteFromFavorite: DeleteFromFavorite
 )

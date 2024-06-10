@@ -47,6 +47,17 @@ fun PriceProductSection(
             Toast(response.message)
         }
     }
+    when(val response = productViewModel.addProductInFavoriteData.value) {
+        is Response.Loading -> {}
+        is Response.Success -> {
+            if(response.data) {
+                Toast(message = "Товар добавлен в избранное")
+            }
+        }
+        is Response.Error -> {
+            Toast(response.message)
+        }
+    }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -74,7 +85,9 @@ fun PriceProductSection(
             )
         }
         TextButton(
-            onClick = {},
+            onClick = {
+                productViewModel.addProductInFavorite(productId = productId)
+            },
             modifier = Modifier
                 .background(colorGray, RoundedCornerShape(10.dp))
                 .border(1.dp, Color.DarkGray, RoundedCornerShape(10.dp))

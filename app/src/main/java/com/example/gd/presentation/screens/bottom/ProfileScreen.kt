@@ -1,7 +1,11 @@
 package com.example.gd.presentation.screens.bottom
 
+import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -35,6 +39,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,6 +54,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.gd.R
@@ -81,9 +87,12 @@ fun ProfileScreen(
     var loyaltyPoints by remember { mutableStateOf("") }
     var isEditOpen by remember { mutableStateOf(false) }
     var isFieldChanged by remember { mutableStateOf(false) }
+    var photoUri by remember { mutableStateOf<Uri?>(null) }
     val unknownUser = "user@${userId.take(5)}"
     val defaultField = "Нет данных"
     val emptyField = "Поле не заполнено"
+
+    val context = LocalContext.current
 
     when(val response = authViewModel.deleteUserState.value) {
         is Response.Loading -> {
@@ -124,8 +133,39 @@ fun ProfileScreen(
                     registrationDate = response.data.registrationDate
                     deliveryAddress = response.data.deliveryAddress
                     loyaltyPoints = response.data.loyaltyPoints.toString()
+                    if (response.data.imageUrl.isNotEmpty()) {
+                        photoUri = Uri.parse(response.data.imageUrl)
+                        Log.d("ProfileScreen", "Photo URI: $photoUri")
+                    }
                 }
             }
+        }
+    }
+
+    when(val response = userViewModel.setUserPhoto.value) {
+        is Response.Loading -> {}
+        is Response.Success -> {
+            if(response.data) {
+                Toast(message = "Фото успешно обновлено")
+            }
+        }
+        is Response.Error -> {
+            Toast(message = response.message)
+        }
+    }
+
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        photoUri = uri
+        if (uri != null) {
+            Log.d("Launch Photo", "Image URI: $uri")
+            val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            context.contentResolver.takePersistableUriPermission(uri, flag)
+            userViewModel.setUserPhoto(photoUri.toString())
+        }
+        else {
+            userViewModel.setUserPhoto("")
         }
     }
 
@@ -194,11 +234,14 @@ fun ProfileScreen(
             }
             else {
                 ProfileHeader(
-                    imageResource = R.drawable.ic_launcher_background,
+                    imageResource = photoUri,
                     contentDescription = null,
                     userName = userName.ifEmpty { unknownUser },
                     userRole = userRole,
-                    modifier = Modifier.padding(bottom = 20.dp)
+                    modifier = Modifier.padding(bottom = 20.dp),
+                    onPhotoClick = {
+                        photoPickerLauncher.launch("image/*")
+                    }
                 )
                 ProfileItem(
                     imageResource = R.drawable.baseline_phone_24,
@@ -377,6 +420,7 @@ fun ProfileScreen(
         }
     }
 }
+
 
 /*
 @Composable

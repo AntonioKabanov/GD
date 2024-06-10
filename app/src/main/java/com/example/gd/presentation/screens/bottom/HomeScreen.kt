@@ -180,7 +180,7 @@ fun Content(navController: NavController) {
             categoryId = selectedCategoryId,
             searchQuery = searchQuery
         )
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(60.dp))
     }
 }
 
@@ -375,12 +375,12 @@ fun PopularSection(
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
                 content = {
                     items(productItemList.size) { item ->
                         Box(
                             modifier = Modifier
-                                .width(200.dp)
+                                .width(230.dp)
                                 .wrapContentHeight()
                                 .padding(10.dp)
                                 .clip(RoundedCornerShape(24.dp))
@@ -402,7 +402,7 @@ fun PopularSection(
                             ) {
                                 GlideImage(
                                     modifier = Modifier
-                                        .size(120.dp),
+                                        .size(140.dp),
                                     model = productItemList[item].image,
                                     contentDescription = "",
                                     contentScale = ContentScale.Fit

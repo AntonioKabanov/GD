@@ -27,17 +27,26 @@ class ProductViewModel @Inject constructor(
     private val _getOrderData = mutableStateOf<Response<List<Product>>>(Response.Loading)
     val getOrderData: State<Response<List<Product>>> = _getOrderData
 
+    private val _getFavoriteData = mutableStateOf<Response<List<Product>>>(Response.Loading)
+    val getFavoriteData: State<Response<List<Product>>> = _getFavoriteData
+
     private val _addProductData = mutableStateOf<Response<Boolean>>(Response.Success(false))
     val addProductData: State<Response<Boolean>> = _addProductData
 
     private val _addProductInOrderData = mutableStateOf<Response<Boolean>>(Response.Success(false))
     val addProductInOrderData: State<Response<Boolean>> = _addProductInOrderData
 
+    private val _addProductInFavoriteData = mutableStateOf<Response<Boolean>>(Response.Success(false))
+    val addProductInFavoriteData: State<Response<Boolean>> = _addProductInFavoriteData
+
     private val _deleteProductData = mutableStateOf<Response<Boolean>>(Response.Success(false))
     val deleteProductData: State<Response<Boolean>> = _deleteProductData
 
     private val _deleteFromOrderData = mutableStateOf<Response<Boolean>>(Response.Success(false))
     val deleteFromOrderData: State<Response<Boolean>> = _deleteFromOrderData
+
+    private val _deleteFromFavoriteData = mutableStateOf<Response<Boolean>>(Response.Success(false))
+    val deleteFromFavoriteData: State<Response<Boolean>> = _deleteFromFavoriteData
 
 
     fun getProductList() {
@@ -61,6 +70,16 @@ class ProductViewModel @Inject constructor(
             viewModelScope.launch {
                 productUseCases.getOrderById(userid = userid).collect {
                     _getOrderData.value = it
+                }
+            }
+        }
+    }
+
+    fun getFavoriteById() {
+        if (userid != null) {
+            viewModelScope.launch {
+                productUseCases.getFavoriteById(userid = userid).collect {
+                    _getFavoriteData.value = it
                 }
             }
         }
@@ -98,6 +117,16 @@ class ProductViewModel @Inject constructor(
         }
     }
 
+    fun addProductInFavorite(productId: String) {
+        if (userid != null) {
+            viewModelScope.launch {
+                productUseCases.addProductInFavorite(productid = productId, userid = userid).collect {
+                    _addProductInFavoriteData.value = it
+                }
+            }
+        }
+    }
+
     fun deleteProduct(productName: String) {
         viewModelScope.launch {
             productUseCases.deleteProduct(productName).collect {
@@ -114,6 +143,15 @@ class ProductViewModel @Inject constructor(
                 }
             }
         }
+    }
 
+    fun deleteFromFavorite(productId: String) {
+        if(userid != null) {
+            viewModelScope.launch {
+                productUseCases.deleteFromFavorite(productId, userid).collect {
+                    _deleteFromFavoriteData.value = it
+                }
+            }
+        }
     }
 }
